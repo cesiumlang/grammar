@@ -623,8 +623,11 @@ Vector3 cross = a $cross$ b;  // uses custom operator
 #f64 zeros = alloc(50, 0.0);      // allocate and initialize
 free(numbers);                    // deallocate
 
-// Reallocation
+// Reallocation (expand or relocate existing allocation)
 numbers = realloc(numbers, 200);  // expand or move allocation
+if (numbers == null) {
+    // realloc failed, original memory still valid
+}
 
 // Memory copying
 copy(destination, source, count); // built-in memory copy
