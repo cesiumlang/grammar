@@ -1,296 +1,696 @@
-# Cesium Programming Language Specification
+# Cesium Programming Language Specification v0.1
+
+## Table of Contents
+
+1. [Overview](#overview)
+1. [Lexical Structure](#lexical-structure)
+1. [Type System](#type-system)
+1. [Variables and Constants](#variables-and-constants)
+1. [Operators and Expressions](#operators-and-expressions)
+1. [Control Flow](#control-flow)
+1. [Functions](#functions)
+1. [Memory Management](#memory-management)
+1. [Object-Oriented Programming](#object-oriented-programming)
+1. [Error Handling](#error-handling)
+1. [Modules and Imports](#modules-and-imports)
+1. [Built-in Functions](#built-in-functions)
+1. [Inline Assembly](#inline-assembly)
+1. [Grammar Reference](#grammar-reference)
 
 ## Overview
-Cesium is a compiled, statically-typed systems programming language focused on mathematical computing and linear algebra operations. It targets C ABI compatibility while providing modern language features and performance optimization capabilities.
 
-## Core Philosophy
-- Math-first language design with built-in mathematical operators
+Cesium is a compiled, statically-typed systems programming language designed for mathematical computing and linear algebra applications. It prioritizes performance, explicit memory management, and mathematical expressiveness while maintaining C ABI compatibility.
+
+### Design Goals
+
+- Math-first language with built-in mathematical operators and types
 - Compile-time dispatch and optimization
-- Explicit memory management with predictable performance
-- Strong typing with safe implicit promotions only
+- Memory safety through ownership tracking and explicit management
+- Strong typing with minimal implicit conversions
 - ASCII-only syntax for universal accessibility
+- C interoperability for existing library integration
+
+### Basic Program Structure
+
+```cesium
+// hello.cesium
+void = main() {
+    printf("Hello, Cesium!\n");
+}
+```
+
+## Lexical Structure
+
+### Comments
+
+```cesium
+// Single-line comment
+
+/*
+  Multi-line comment
+*/
+
+/// Documentation comment for functions
+/// Multiple lines supported
+void = documented_function() {
+    // implementation
+}
+```
+
+### Keywords
+
+Cesium reserves the following keywords:
+
+**Control Flow:** `if`, `while`, `for`, `else`, `do`, `with`, `defer`, `break`, `continue`, `switch`, `case`, `fallthrough`, `throw`
+
+**Function Qualifiers:** `operator`, `context`, `property`, `private`, `secret`, `static`, `destruct`
+
+**Language Constructs:** `alias`, `catch`, `as`, `return`, `comptime`, `generic`, `sizeof`, `typeof`, `asm`
+
+**Memory Management:** `alloc`, `free`, `realloc`
+
+**Core Types:** `file`, `str`, `list`, `dict`, `slice`, `struct`, `void`, `enum`, `path`, `error`, `uword`, `null`
+
+**Variable Qualifiers:** `const`, `static`, `private`, `secret`, `volatile`, `atomic`, `register`, `simd`
+
+**C Interop:** `extern`, `export`
+
+**OOP Constructs:** `trait`, `impl`, `type`, `this`, `super`
+
+**Namespacing:** `std`, `namespace`
+
+**Built-in Functions:** `printf`, `debugf`, `assert`, `stdout`, `stdin`, `stderr`
+
+### Identifiers
+
+Identifiers follow C-style rules: start with letter or underscore, followed by letters, digits, or underscores.
+
+### String Literals and Interpolation
+
+```cesium
+str simple = "Hello, world!";
+str interpolated = `Hello, {name}! You have {count} messages.`;
+path file_path = `{home_dir}/config/settings.conf`;
+```
 
 ## Type System
 
 ### Primitive Types
-- Integer types: `u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64`
-- Floating point: `f32`, `f64`
-- Word-sized integer: `uword` (pointer-sized, maps to `u32`/`u64`)
-- No separate `bool` or `char` types - use `u8`
 
-### Composite Types
-- Fixed arrays: `T[N]` (e.g., `i32[10]`)
-- Array slices: `slice[T]` (non-owning views)
-- Dynamic arrays: `list[T]` (owning, resizable)
-- Hash maps: `dict[K,V]`
-- Structs: `struct Name { ... }`
-- Enums: `enum [Type] Name { ... }`
-- Union types: `TypeA|TypeB` (defined via `alias`)
-- Pointers: `#T` (pointer to type T)
-- Strings: `str` (UTF-8 with explicit length, null-terminated internally)
-- File paths: `path` (platform-agnostic path handling)
-- File handles: `file`
-- Error types: `error Name { ... }`
+```cesium
+// Integer types
+u8 byte_val = 255;
+u16 short_val = 65535;
+u32 int_val = 4294967295;
+u64 long_val = 18446744073709551615;
+
+i8 signed_byte = -128;
+i16 signed_short = -32768;
+i32 signed_int = -2147483648;
+i64 signed_long = -9223372036854775808;
+
+// Floating point
+f32 single = 3.14f;
+f64 double = 3.141592653589793;
+
+// Word-sized integer (pointer-sized)
+uword size = 1024;
+
+// No separate bool or char - use u8
+u8 is_valid = 1;  // true
+u8 letter = 65;   // 'A'
+```
+
+### Array Types
+
+```cesium
+// Fixed arrays
+i32 numbers[10];
+f64 matrix[3][3];  // 3x3 matrix
+
+// Array type syntax (for function parameters)
+void = process_data(f64[] values, uword count);
+
+// Dynamic arrays
+list[i32] dynamic_numbers;
+slice[f64] array_view;  // non-owning view
+```
 
 ### SIMD Types
-SIMD vectors use the `simd` qualifier with array notation:
+
 ```cesium
-simd f32 vec[4];     // 4-element float vector
-simd f64 data[8];    // 8-element double vector
+simd f32 vec4[4];     // 4-element float vector
+simd f64 vec2[2];     // 2-element double vector
+simd u32 vec8[8];     // 8-element integer vector
+
+// SIMD operations work with existing operators
+simd f32 a[4], b[4], result[4];
+result = a + b;  // vectorized addition
+```
+
+### Pointer Types
+
+```cesium
+#i32 int_ptr;         // pointer to i32
+##i32 ptr_to_ptr;     // pointer to pointer to i32
+
+// Ownership and borrowing
+Matrix m := create_matrix();     // owned value
+#Matrix borrowed = #m;           // immutable borrow  
+~Matrix mutable = ~m;            // mutable borrow
+```
+
+### User-Defined Types
+
+```cesium
+// Structs
+struct Point {
+    f64 x = 0.0;
+    f64 y = 0.0;
+}
+
+// Enums with custom backing types
+enum Status { OK; ERROR; PENDING; }
+enum i16 ErrorCode { FILE_NOT_FOUND = -1; ACCESS_DENIED = -2; }
+
+// Error types
+error FileNotFound {
+    str path;
+    i32 errno;
+}
+
+// Union types via aliases
+alias Number = i32|f64;
+alias Result = Matrix|FileNotFound;
 ```
 
 ### Type Conversion Rules
-- **Implicit promotions**: `int` → `float`, smaller → larger of same signedness
-- **Explicit conversions**: Use rounding functions `floor()`, `ceil()`, `round()`, `trunc()` for float→int
-- **Bit reinterpretation**: `as` operator for same-size type reinterpretation
-- **Mixed signed/unsigned**: Custom comparison logic preserving mathematical correctness
-- **Literal typing**: Context-driven - literals adapt to assignment target when possible
 
-## Variable Declarations
-
-### Basic Syntax
 ```cesium
-i32 x = 42;           // explicit type
-const i32 y := 100;   // const with explicit type (note := operator)
+// Implicit promotions (safe)
+i32 x = 42;
+f64 y = x;           // i32 → f64 OK
+
+// Explicit conversions for narrowing
+f64 pi = 3.14159;
+i32 truncated = trunc(pi);  // use rounding functions
+
+// Bit reinterpretation
+u32 bits = 0x3F800000;
+f32 float_val = bits as f32;
+
+// Context-driven literal typing
+u8 small = 255;      // 255 becomes u8
+i16 medium = 255;    // 255 becomes i16
+```
+
+## Variables and Constants
+
+### Variable Declaration
+
+```cesium
+// Basic declaration with initialization
+i32 count = 0;
+f64 pi = 3.14159;
+
+// Constant variables
+const i32 MAX_SIZE = 1000;
+const str VERSION = "1.0.0";
+
+// Ownership assignment
+Matrix owned := create_matrix();  // takes ownership
+Matrix copy = owned;              // error - cannot copy owned value
+Matrix moved := move(owned);      // explicit ownership transfer
 ```
 
 ### Qualifiers
-- `const` - immutable after initialization (uses `:=` operator)
-- `static` - function-scoped persistence or class-shared variables
-- `private` - module-internal visibility
-- `secret` - class-internal only (not accessible to subclasses)
-- `volatile` - prevents compiler optimizations
-- `atomic` - thread-safe operations
-- `register` - optimization hint for register allocation
-- `simd` - SIMD vector type qualifier
 
-## Function Declarations
-
-### Basic Syntax
 ```cesium
-return_type = function_name(param_type param_name) {
-    return value;
+// Storage and access qualifiers
+static i32 global_counter = 0;    // function-scoped persistence
+private void = helper();          // module-internal function
+secret i32 internal_state;       // class-internal only
+
+// Hardware qualifiers  
+volatile u32 hardware_register;   // prevent optimization
+atomic u64 shared_counter;        // thread-safe operations
+register u64 hot_variable;        // register allocation hint
+```
+
+## Operators and Expressions
+
+### Operator Precedence (highest to lowest)
+
+```cesium
+// 1. Primary expressions
+result = func(a, b);      // function call
+element = array[index];   // indexing
+member = obj.field;       // member access
+
+// 2. Custom unary operators
+result = $negate$x;       // custom unary operator
+
+// 3. Postfix operators  
+transposed = matrix~;     // matrix transpose
+
+// 4. Unary prefix operators
+addr = #variable;         // address-of
+value = #pointer;         // dereference (auto in most contexts)
+root = ::x;              // square root
+
+// 5. Binary root operator
+cube_root = 3::27;       // nth root
+
+// 6. Exponentiation (right-associative)
+power = base^exponent;
+
+// 7. Multiplicative
+product = a * b;         // context-aware multiplication
+quotient = a / b;
+remainder = a % b;
+cross = vec1 @ vec2;     // cross product
+
+// 8. String concatenation
+message = "Hello" ** " " ** "World";
+
+// 9. Additive
+sum = a + b;
+difference = a - b;
+
+// 10. Bit shifts
+shifted = value << 2;
+shifted = value >> 1;
+
+// 11-16. Comparison and logical operators
+// 17. Custom binary operators
+result = a $dot$ b;      // custom binary operator
+
+// 18. Assignment
+x = 42;
+owned := create_value();
+```
+
+### Context-Aware Multiplication
+
+```cesium
+// Scalar multiplication
+f64 scalar = 2.0;
+f64 result = scalar * 3.14;
+
+// Vector operations  
+vector[3] v1, v2;
+f64 dot_product = v1 * v2;      // dot product
+vector[3] cross_product = v1 @ v2;  // cross product
+
+// Matrix operations
+matrix[3,3] A, B;
+matrix[3,3] C = A * B;          // matrix multiplication
+vector[3] v = A * v1;           // matrix-vector multiplication
+
+// Mixed operations
+vector[3] scaled = 2.0 * v1;    // scalar-vector multiplication
+```
+
+### Pointer Operations and Contexts
+
+```cesium
+i32 value = 42;
+#i32 ptr = #value;              // address-of
+
+// Default dereference - ptr automatically dereferenced
+i32 copy = ptr;                 // gets value at ptr
+
+// Address context for pointer arithmetic
+#i32 incremented = ptr #+ 1;    // pointer arithmetic
+i32 offset_value = (ptr #+ 2);  // value context within pointer context
+
+// Explicit address context forcing
+result = addrcontext(ptr) + offset;  // force address interpretation
+```
+
+## Control Flow
+
+### Conditional Statements
+
+```cesium
+if (condition) {
+    printf("Condition is true\n");
+} else if (other_condition) {
+    printf("Other condition is true\n");
+} else {
+    printf("No conditions met\n");
+}
+```
+
+### Loops
+
+```cesium
+// While loop
+i32 count = 0;
+while (count < 10) {
+    printf("Count: {}\n", count);
+    count++;
+}
+
+// Do-while loop
+do {
+    input = get_user_input();
+} while (input != "quit");
+
+// For loops with ranges
+for (i32 i = 0..10) {        // 0,1,2,...,9 (exclusive)
+    printf("i = {}\n", i);
+}
+
+for (i32 i = 0..=10) {       // 0,1,2,...,10 (inclusive)
+    printf("i = {}\n", i);
+}
+
+for (i32 i = 0..2..=10) {    // 0,2,4,6,8,10 (step 2)
+    printf("i = {}\n", i);
+}
+
+// Iteration over collections
+i32 numbers[5] = {1, 2, 3, 4, 5};
+for (i32 value = numbers) {
+    printf("Value: {}\n", value);
+}
+```
+
+### Pattern Matching
+
+```cesium
+// Switch statements
+switch (value) {
+    case (1) { printf("One\n"); }
+    case (2, 3) { printf("Two or Three\n"); }
+    case (10..=20) { printf("Between 10 and 20\n"); }
+    else { printf("Something else\n"); }
+}
+
+// Optional fallthrough
+fallthrough switch (status) {
+    case (STARTING) { 
+        initialize();
+        // falls through
+    }
+    case (RUNNING) {
+        process();
+        break;  // explicit break
+    }
+    case (STOPPED) {
+        cleanup();
+    }
+}
+
+// Type matching
+Number num = get_number();  // Number = i32|f64
+switch (typeof(num)) {
+    case (i32) { 
+        i32 val = num as i32;
+        printf("Integer: {}\n", val);
+    }
+    case (f64) {
+        f64 val = num as f64;
+        printf("Float: {}\n", val);
+    }
+}
+```
+
+### Loop Control
+
+```cesium
+for (i32 i = 0..100) {
+    if (i % 2 == 0) {
+        continue;  // skip even numbers
+    }
+    if (i > 50) {
+        break;     // exit loop
+    }
+    printf("{}\n", i);
+}
+```
+
+## Functions
+
+### Function Declaration
+
+```cesium
+// Basic function
+i32 = add(i32 a, i32 b) {
+    return a + b;
 }
 
 // Multiple return values
-i32, f64 = multiple_returns(i32 x) {
-    return x * 2, x * 3.14;
+i32, f64 = divide_with_remainder(i32 dividend, i32 divisor) {
+    return dividend / divisor, dividend % divisor;
 }
 
 // No return value
-void = no_return_func() {
-    // statements only
+void = print_message(str message) {
+    printf("{}\n", message);
+}
+
+// Function with ownership/borrowing
+void = process_data(~Matrix data) {      // takes mutable borrow
+    // can modify data in-place
+    data.transpose();
+}
+
+Matrix = create_matrix(i32 rows, i32 cols) {
+    Matrix result := alloc_matrix(rows, cols);  // returns owned value
+    return result;
 }
 ```
 
 ### Function Qualifiers
-- `static` - no implicit `this` parameter (required if `this` not used)
-- `private` - module-internal function
-- `secret` - class-internal function
-- `operator` - operator overload function
-- `context` - context manager functions (for `with` blocks)
-- `property` - getter/setter functions
 
-### Variadic Functions
 ```cesium
-// Cesium-style (type-safe, becomes slice internally)
-void = print_values(...i32 numbers) {
-    for (uword i = 0..numbers.len) {
-        printf("{}\n", numbers[i]);
+struct Calculator {
+    private f64 last_result;
+    
+    // Static method (no 'this' parameter)
+    static Calculator = create() {
+        return Calculator { last_result = 0.0 };
     }
-}
-
-// C-style (for extern functions only)
-extern libc = import('c') {
-    i32 = printf(str fmt, ...);
+    
+    // Private method (module internal)
+    private void = validate_input(f64 value) {
+        assert(value >= 0.0);
+    }
+    
+    // Secret method (class internal only)
+    secret void = internal_operation() {
+        // implementation details
+    }
 }
 ```
 
 ### Generic Functions
+
 ```cesium
+// Basic generic function
 generic<T> T = max(T a, T b) {
     return a > b ? a : b;
 }
 
+// Generic with trait constraints
 generic<numeric T> T = dot_product(slice[T] a, slice[T] b) {
+    assert(a.len == b.len);
     T sum = 0;
     for (uword i = 0..a.len) {
         sum += a[i] * b[i];
     }
     return sum;
 }
+
+// Multiple type parameters
+generic<K, V> V = dict_get(dict[K,V] d, K key, V default_value) {
+    // implementation
+}
+
+// Usage
+f64 result = max(3.14, 2.71);           // T inferred as f64
+i32 larger = max<i32>(10, 20);          // explicit type
 ```
 
-## Operators
+### Variadic Functions
 
-### Arithmetic Operators (by precedence, highest first)
-1. `()` `[]` `.` - grouping, indexing, member access
-2. `~` (postfix) - matrix transpose
-3. `::` (prefix) - square root, `n :: x` - nth root
-4. `^` - exponentiation (right-associative)
-5. `*` `/` `%` `@` - multiplication/division/modulus/cross product
-6. `+` `-` - addition/subtraction
-7. `<<` `>>` - bit shifts
-
-### Context-Aware Multiplication (`*`)
-- `scalar * scalar` → numeric multiplication
-- `matrix * matrix` → matrix multiplication  
-- `matrix * vector` → matrix-vector multiplication
-- `vector * vector` → dot product
-- `scalar * vector/matrix` → scalar multiplication
-
-### Comparison and Logical
-8. `<` `<=` `>` `>=` - comparisons
-9. `==` `!=` - equality
-10. `&` - bitwise AND
-11. `><` - bitwise XOR  
-12. `|` - bitwise OR
-13. `&&` - logical AND
-14. `||` - logical OR
-
-### Assignment
-15. `=` `:=` and compound assignments (`+=`, `-=`, etc.)
-16. `,` - sequencing
-
-### Pointer Operations
-- `#` prefix for pointers: `#var` (address-of), `#type` (pointer type)
-- Default dereference: pointer variables automatically dereference
-- Address context: `#` prefix on operators for pointer arithmetic
-- Context escape: `()` creates value context within pointer context
-- Address forcing: `addrcontext(var)` forces address interpretation
-
-### Custom Operators
-- Predefined operators can be overloaded
-- Custom operators use `$name$` syntax
-- Example: `result = a $cross$ b`
-
-## Control Flow
-
-### Conditional Statements
 ```cesium
-if (condition) {
-    // statements
-} else if (condition2) {
-    // statements  
-} else {
-    // statements
+// Cesium-style variadics (type-safe, becomes slice)
+void = print_numbers(...i32 numbers) {
+    for (uword i = 0..numbers.len) {
+        printf("{} ", numbers[i]);
+    }
+    printf("\n");
+}
+
+// Usage
+print_numbers(1, 2, 3, 4, 5);
+
+// C-style variadics (for extern functions only)
+extern libc = import('c') {
+    i32 = printf(str fmt, ...);
 }
 ```
 
-### Loops
+### Operator Overloading
+
 ```cesium
-// While loop
-while (condition) {
-    // statements
+// Built-in operator overloading
+struct Vector3 {
+    f64 x, y, z;
+    
+    // Overload addition operator
+    Vector3 = operator +(Vector3 other) {
+        return Vector3 {
+            x = this.x + other.x,
+            y = this.y + other.y,
+            z = this.z + other.z
+        };
+    }
+    
+    // Overload multiplication for dot product
+    f64 = operator *(Vector3 other) {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
+    }
 }
 
-// Do-while loop  
-do {
-    // statements
-} while (condition);
-
-// For loop with ranges
-for (i32 i = 0..10) {        // exclusive end: 0,1,2...9
-    // statements
+// Custom operator definition
+Vector3 = operator $cross$(Vector3 a, Vector3 b) {
+    return Vector3 {
+        x = a.y * b.z - a.z * b.y,
+        y = a.z * b.x - a.x * b.z,
+        z = a.x * b.y - a.y * b.x
+    };
 }
 
-for (i32 i = 0..=10) {       // inclusive end: 0,1,2...10
-    // statements  
-}
-
-for (i32 i = 0..2..=10) {    // step 2: 0,2,4,6,8,10
-    // statements
-}
-
-// For loop with arrays/slices
-for (i32 val = array) {
-    // val gets each array element
-}
+// Usage
+Vector3 a, b, result;
+result = a + b;          // uses overloaded +
+f64 dot = a * b;         // uses overloaded *
+Vector3 cross = a $cross$ b;  // uses custom operator
 ```
 
-### Pattern Matching
+## Memory Management
 
-#### Switch Statements
+### Basic Memory Operations
+
 ```cesium
-switch (value) {
-    case (1) { /* statements */ }
-    case (2, 3) { /* multiple values */ }
-    case (5..7) { /* range */ }
-    case (TypeA|TypeB) { /* type union */ }
-    else { /* default */ }
-}
+// Allocation and deallocation
+#i32 numbers = alloc(100);        // allocate array of 100 i32s
+#f64 zeros = alloc(50, 0.0);      // allocate and initialize
+free(numbers);                    // deallocate
 
-// Optional fallthrough behavior
-fallthrough switch (value) {
-    case (1) { /* falls through */ }
-    case (2) { break; }  // explicit break
-}
+// Reallocation
+numbers = realloc(numbers, 200);  // expand or move allocation
+
+// Memory copying
+copy(destination, source, count); // built-in memory copy
 ```
 
-#### Error Handling
+### Automatic Resource Management
+
 ```cesium
-// Basic catch
-f = file('test.txt') catch {
-    printf("File operation failed");
+// Defer statements (execute at function return)
+void = process_file(str filename) {
+    #u8 buffer = alloc(1024);
+    defer free(buffer);           // executed when function returns
+    
+    if (some_condition) {
+        return;  // defer executes here
+    }
+    
+    // defer also executes at normal function end
 }
 
-// Pattern matching catch
-f = file('test.txt') catch (err) {
-    case (FileNotFound) { printf("Not found: {}", err.path); }
-    case (AccessDenied) { printf("Access denied"); }
-    else { printf("Other error"); }
+// Defer with blocks
+void = complex_processing() {
+    defer {
+        cleanup_temp_files();
+        reset_global_state();
+    };
+    
+    // multiple operations deferred together
 }
-```
-
-### Control Keywords
-- `break` - exit loop or switch
-- `continue` - next loop iteration
-- `return` - function return
-- `defer` - execute at function exit (LIFO order)
-
-## Resource Management
-
-### Memory Management
-```cesium
-#i32 ptr = alloc(100);           // allocate array of 100 i32s
-#i32 zeros = alloc(100, 0);      // allocate and initialize to 0
-free(ptr);                       // deallocate
-copy(dest, src, count);          // memory copy
 ```
 
 ### Context Managers
-```cesium
-// Define context manager
-file = context enter(str path) { /* open file */ }
-void = context exit(file f) { /* close file */ }
 
-// Use with 'with' block
-with f = file('data.txt') {
-    data = read(f);
-    // exit() called automatically
-} catch (err) {
-    case (FileNotFound) { /* handle error */ }
+```cesium
+// Define context manager for file handling
+file = context enter(str path, str mode) {
+    // open file and return handle
 }
+
+void = context exit(file f) {
+    // close file automatically
+}
+
+// Usage with automatic cleanup
+void = read_config() {
+    with f = file("config.txt", "r") {
+        data = read_all(f);
+        process_config(data);
+        // file automatically closed on exit
+    } catch (err) {
+        case (FileNotFound) { 
+            printf("Config file not found\n"); 
+        }
+    }
+}
+```
+
+### Ownership and Borrowing
+
+```cesium
+// Ownership transfer
+Matrix create_identity(i32 size) {
+    Matrix result := allocate_matrix(size, size);  // owned
+    // ... initialize
+    return result;  // ownership transferred to caller
+}
+
+// Borrowing for read-only access
+f64 = calculate_determinant(#Matrix m) {
+    // can read m, cannot modify
+    // caller retains ownership
+}
+
+// Mutable borrowing for in-place operations
+void = transpose_inplace(~Matrix m) {
+    // exclusive access to modify m
+    // caller retains ownership after function returns
+}
+
+// Usage
+Matrix mat := create_identity(3);           // takes ownership
+f64 det = calculate_determinant(#mat);      // lends for reading
+transpose_inplace(~mat);                    // lends for modification
+// mat still owned and valid here
 ```
 
 ## Object-Oriented Programming
 
-### Struct Definition
+### Struct Definition and Usage
+
 ```cesium
 struct Point {
-    f64 x = 0.0, y = 0.0;    // fields with defaults
-    private f64 internal;     // private field
-    secret f64 truly_private; // not accessible to subclasses
+    f64 x = 0.0;
+    f64 y = 0.0;
+    private f64 internal_id;     // accessible to subclasses
+    secret f64 truly_private;    // not accessible to subclasses
     
     // Constructor
     Point(f64 px, f64 py) {
         x = px;
         y = py;
+        internal_id = generate_id();
     }
     
-    // Destructor  
-    ~Point() {
-        // cleanup
+    // Destructor
+    destruct Point() {
+        cleanup_resources();
     }
     
     // Static method
@@ -299,84 +699,142 @@ struct Point {
     }
     
     // Instance method
-    f64 = distance() {
-        return ::(x^2 + y^2);
+    f64 = distance_from_origin() {
+        return ::(x^2 + y^2);  // sqrt of sum of squares
+    }
+    
+    // Method with mutable access
+    void = translate(f64 dx, f64 dy) {
+        x += dx;
+        y += dy;
     }
 }
+
+// Usage
+Point p1(3.0, 4.0);
+Point origin = Point.origin();      // static method call
+f64 dist = p1.distance_from_origin();
+p1.translate(1.0, -1.0);
 ```
 
 ### Inheritance
+
 ```cesium
 // Single inheritance
-struct Point3(Point) {
+struct Point3D(Point) {
     f64 z = 0.0;
     
-    Point3(f64 px, f64 py, f64 pz) {
-        super Point(px, py);  // parent constructor
+    Point3D(f64 px, f64 py, f64 pz) {
+        super Point(px, py);  // call parent constructor
         z = pz;
     }
     
-    ~Point3() {
-        // local cleanup first
-        super ~Point();       // then parent cleanup
+    destruct Point3D() {
+        // local cleanup
+        super ~Point();       // call parent destructor
+    }
+    
+    // Override parent method
+    f64 = distance_from_origin() {
+        return ::(x^2 + y^2 + z^2);
     }
 }
 
-// Multiple inheritance (left-to-right, rightmost wins conflicts)
-struct Diamond(Left, Right) {
-    Diamond() {
-        super Left();
-        super Right();
+// Multiple inheritance
+struct ColoredPoint(Point, Colored) {
+    ColoredPoint(f64 x, f64 y, Color c) {
+        super Point(x, y);     // left-to-right constructor calls
+        super Colored(c);
     }
     
-    // Override method resolution
-    i32 = Left.some_method;  // use Left's version instead of Right's
+    // Method resolution override (use Point's version instead of Colored's)
+    str = Point.to_string;
 }
 ```
 
 ### Properties
+
 ```cesium
 struct Circle {
     private f64 radius;
     
-    // Getter
+    // Getter property
     f64 = property area() {
         return 3.14159 * radius^2;
     }
     
-    // Setter (returns assigned value)
+    // Setter property (returns assigned value for chaining)
     f64 = property.set radius(f64 r) {
+        assert(r >= 0.0);
         this.radius = r;
-        return r;
+        return r;  // enables: x = circle.radius = 5.0
+    }
+    
+    // Read-only property (getter only)
+    f64 = property circumference() {
+        return 2.0 * 3.14159 * radius;
     }
 }
 
-// Usage: circle.area, circle.radius = 5.0
+// Usage
+Circle c;
+c.radius = 5.0;              // calls setter
+f64 area = c.area;           // calls getter
+// c.circumference = 10.0;   // error: read-only property
 ```
 
-### Traits
+### Traits and Implementation
+
 ```cesium
-trait Numeric {
-    type = add(type other);
-    type = multiply(type other);
-}
-
-impl Numeric(f64) {
-    type = add(type other) { return this + other; }
-    type = multiply(type other) { return this * other; }
-}
-
-impl Numeric(Vec3) {
-    type = add(type other) { 
-        return Vec3(this.x + other.x, this.y + other.y, this.z + other.z);
+// Define trait interface
+trait Drawable {
+    void = draw();
+    void = resize(f64 scale);
+    
+    // Default implementation
+    void = highlight() {
+        printf("Highlighting drawable object\n");
     }
+}
+
+trait Comparable {
+    i32 = compare(type other);  // type refers to implementing type
+}
+
+// Implement traits for types
+impl Drawable(Circle) {
+    void = draw() {
+        printf("Drawing circle with radius {}\n", this.radius);
+    }
+    
+    void = resize(f64 scale) {
+        this.radius *= scale;
+    }
+    
+    // highlight() uses default implementation
+}
+
+impl Comparable(Circle) {
+    i32 = compare(Circle other) {
+        if (this.radius < other.radius) return -1;
+        if (this.radius > other.radius) return 1;
+        return 0;
+    }
+}
+
+// Generic functions using traits
+generic<Drawable T> void = render_object(T obj) {
+    obj.draw();
+    obj.highlight();
 }
 ```
 
 ## Error Handling
 
-### Error Types
+### Error Type Definition
+
 ```cesium
+// Define error types
 error FileNotFound {
     str path;
     i32 errno;
@@ -384,112 +842,636 @@ error FileNotFound {
 
 error AccessDenied {
     str message;
+    i32 permission_level;
 }
 
-// Union types for multiple errors
-alias FileError = FileNotFound|AccessDenied|IOError;
+error NetworkTimeout {
+    str host;
+    i32 timeout_ms;
+}
+
+// Error union types
+alias FileError = FileNotFound|AccessDenied;
+alias IOError = FileError|NetworkTimeout;
 ```
 
-### Error Propagation and Handling
-Functions returning errors use union return types. The `catch` construct handles errors with pattern matching and implicit `typeof()` checking.
+### Error Propagation Methods
 
-## Module System and Imports
+```cesium
+// Return errors (exits function immediately)
+FileError|file = open_file(str path) {
+    if (!file_exists(path)) {
+        return FileNotFound { path = path, errno = 2 };
+    }
+    if (!has_permission(path)) {
+        return AccessDenied { message = "Read permission denied", permission_level = 0 };
+    }
+    
+    file handle = create_file_handle(path);
+    return handle;  // success case
+}
 
-### Namespace Declaration
-Files can declare custom namespaces or use default file-based namespacing.
+// Throw errors (continues execution, collected for later handling)
+void = batch_process_files(str[] file_paths) {
+    for (str path = file_paths) {
+        if (!validate_path(path)) {
+            throw FileNotFound { path = path, errno = 404 };
+            continue;  // process remaining files
+        }
+        
+        if (!check_permissions(path)) {
+            throw AccessDenied { message = "Cannot access file", permission_level = 1 };
+            continue;
+        }
+        
+        process_single_file(path);
+    }
+    // All thrown errors handled by catch after function completes
+}
+```
+
+### Error Handling with Catch
+
+```cesium
+// Basic error catching
+file_or_error = open_file("data.txt");
+file_or_error catch {
+    printf("Failed to open file\n");
+}
+
+// Pattern matching on error types
+file_or_error catch (err) {
+    case (FileNotFound) {
+        printf("File not found: {}\n", err.path);
+        create_default_file(err.path);
+    }
+    case (AccessDenied) {
+        printf("Access denied: {}\n", err.message);
+        request_elevated_permissions();
+    }
+}
+
+// Multiple error types
+file_or_error catch (err) {
+    case (FileNotFound|AccessDenied) {
+        printf("File access error: cannot open file\n");
+    }
+    case (NetworkTimeout) {
+        printf("Network timeout accessing {}\n", err.host);
+    }
+    else {
+        printf("Unknown error occurred\n");
+    }
+}
+
+// Catching thrown errors from batch operations
+batch_process_files(file_list) catch (err) {
+    case (FileNotFound) {
+        printf("Skipped missing file: {}\n", err.path);
+    }
+    case (AccessDenied) {
+        printf("Permission denied for file\n");
+    }
+}
+```
+
+### Error Handling with Context Managers
+
+```cesium
+// Combining with resource management
+with f = file("data.txt", "r") {
+    data = read_all(f);
+    result = process_data(data);
+    return result;
+} catch (err) {
+    case (FileNotFound) {
+        printf("Input file missing\n");
+        return default_result();
+    }
+    case (AccessDenied) {
+        printf("Cannot read input file\n");
+        return error_result();
+    }
+}
+// file automatically closed even if errors occur
+```
+
+## Modules and Imports
+
+### Module Structure
+
+```cesium
+// File: math/vector.cesium
+namespace math.vector;
+
+// Public interface
+struct Vector3 {
+    f64 x, y, z;
+    
+    Vector3 = operator +(Vector3 other) {
+        return Vector3 { x + other.x, y + other.y, z + other.z };
+    }
+}
+
+f64 = magnitude(Vector3 v) {
+    return ::(v.x^2 + v.y^2 + v.z^2);
+}
+
+// Private helper function
+private f64 = square(f64 x) {
+    return x * x;
+}
+```
 
 ### Import Syntax
-```cesium
-// Cesium modules
-import(mylib) { func1; func2 as f2 }
-builtins = import(std.builtin)
 
-// External C libraries
+```cesium
+// Import entire modules
+import(math.vector);
+import(std.io) as io;
+
+// Selective imports
+import(math.matrix) { Matrix; multiply as mat_mult; invert };
+import(graphics.primitives) { 
+    Circle; 
+    Rectangle as Rect; 
+    export Triangle;  // import as global name
+}
+
+// Using imported functions
+Vector3 v1, v2;
+Vector3 sum = math.vector.add(v1, v2);
+Matrix m = mat_mult(matrix1, matrix2);
+Triangle tri;  // globally available due to 'export'
+```
+
+### External Library Integration
+
+```cesium
+// Import C libraries
 extern libc = import('c') {
     i32 = printf(str fmt, ...);
     #void = malloc(uword size) as malloc;  // global alias
-    export void = free(#void ptr);         // import as global name
+    export void = free(#void ptr);         // import as global
+}
+
+extern math_lib = import('m') {
+    f64 = sin(f64 x);
+    f64 = cos(f64 x);
+    f64 = sqrt(f64 x) as sqrt;
+}
+
+// Platform-specific imports
+extern windows = import('kernel32') {
+    i32 = GetCurrentProcessId();
+    void = Sleep(u32 milliseconds);
+}
+
+extern posix = import('unistd') {
+    i32 = getpid();
+    i32 = sleep(u32 seconds);
+}
+
+// Usage
+void = cross_platform_delay(u32 ms) {
+    comptime {
+        if (target_os == "windows") {
+            windows.Sleep(ms);
+        } else {
+            posix.sleep(ms / 1000);
+        }
+    }
 }
 ```
 
-### Export Rules
-- Items are public by default within modules
-- `private` restricts to module scope
-- `secret` restricts to class scope only
-- Exported functions to C get automatic wrapper generation for Cesium variadics
+### Module Interface Files
 
-## String Interpolation
-Backtick strings support expression interpolation:
 ```cesium
-str name = "world";  
-i32 count = 42;
-str message = `Hello, {name}! Count: {count}`;
+// math_vector.m (module interface file)
+namespace math.vector;
+
+// Public type declarations
+struct Vector3 {
+    f64 x, y, z;
+    // method signatures without implementation
+    Vector3 = operator +(Vector3 other);
+}
+
+// Public function signatures
+f64 = magnitude(Vector3 v);
+Vector3 = normalize(Vector3 v);
+Vector3 = cross_product(Vector3 a, Vector3 b);
+```
+
+## Built-in Functions
+
+### I/O Functions
+
+```cesium
+// Formatted output
+printf("Hello, {}!\n", name);                    // stdout
+printf(stderr, "Error: {}\n", error_message);    // explicit stream
+debugf("Debug info: value = {}\n", debug_value); // stderr shortcut
+
+// Standard streams
+file output = stdout;
+file input = stdin;
+file errors = stderr;
+```
+
+### Mathematical Functions
+
+```cesium
+// Trigonometric functions (built-in, shadowable)
+f64 angle = 1.57;
+f64 sine = sin(angle);
+f64 cosine = cos(angle);
+f64 tangent = tan(angle);
+
+// Rounding functions (required for float->int conversion)
+f64 value = 3.7;
+i32 down = floor(value);    // 3
+i32 up = ceil(value);       // 4
+i32 nearest = round(value); // 4
+i32 toward_zero = trunc(value); // 3
+
+// Root functions (also available as operators)
+f64 square_root = sqrt(25.0);  // or ::25.0
+f64 cube_root = cbrt(27.0);    // or 3::27.0
+```
+
+### Type Introspection
+
+```cesium
+// Type and size information
+uword int_size = sizeof(i32);           // 4
+uword array_size = sizeof(numbers);     // total array size in bytes
+str type_name = typeof(variable);       // "i32", "Vector3", etc.
+
+// Usage in generic functions
+generic<T> void = print_type_info(T value) {
+    printf("Type: {}, Size: {} bytes\n", typeof(value), sizeof(T));
+}
+```
+
+### Assertion and Debugging
+
+```cesium
+// Runtime assertions
+void = validate_input(i32 value) {
+    assert(value >= 0);  // program terminates if false
+    assert(value < MAX_VALUE, "Value too large: {}", value);
+}
+
+// Compile-time assertions
+comptime {
+    assert(sizeof(i32) == 4);  // verified at compile time
+}
 ```
 
 ## Inline Assembly
-Raw assembly blocks using Intel syntax:
+
+### Basic Assembly Blocks
+
 ```cesium
+// Raw assembly with Intel syntax
 volatile u64 timestamp;
 asm {
     rdtsc
-    shl rdx, 32  
+    shl rdx, 32
     or rax, rdx
     mov timestamp, rax
 }
+
+// SIMD assembly operations
+simd f32 a[4], b[4], result[4];
+asm {
+    vmovups xmm0, a
+    vmovups xmm1, b
+    vaddps xmm0, xmm0, xmm1
+    vmovups result, xmm0
+}
 ```
 
-## Built-in Functions and I/O
-- `printf()` - formatted output (defaults to stdout)
-- `debugf()` - shortcut for `printf(stderr, ...)`
-- `sizeof()` - type/variable size
-- `typeof()` - type introspection
-- Standard streams: `stdout`, `stdin`, `stderr`
-- Math functions: `sin()`, `cos()`, `floor()`, `ceil()`, `round()`, `trunc()` (all built-ins, shadowable)
+### Performance-Critical Operations
 
-## Reserved Keywords
+```cesium
+// Custom memory operations
+void = fast_memcpy(#void dest, #void src, uword count) {
+    asm {
+        mov rdi, dest
+        mov rsi, src
+        mov rcx, count
+        rep movsb
+    }
+}
 
-### Control Flow
-`if`, `while`, `for`, `else`, `do`, `with`, `defer`, `break`, `continue`, `switch`, `case`, `fallthrough`
+// Hardware-specific optimizations
+f64 = fast_sqrt(f64 value) {
+    f64 result;
+    asm {
+        sqrtsd xmm0, value
+        movsd result, xmm0
+    }
+    return result;
+}
+```
 
-### Function Qualifiers  
-`operator`, `context`, `property`, `private`, `secret`, `static`
+## Grammar Reference
 
-### Language Constructs
-`alias`, `catch`, `as`, `return`, `comptime`, `generic`, `sizeof`, `typeof`, `asm`
+### Lexical Grammar
 
-### Memory Management
-`alloc`, `free`
+```cesium
+// Tokens
+IDENTIFIER := [a-zA-Z_][a-zA-Z0-9_]*
+INTEGER := [0-9]+ | 0x[0-9a-fA-F]+ | 0b[01]+
+FLOAT := [0-9]*\.[0-9]+([eE][+-]?[0-9]+)?
+STRING := "([^"\\]|\\.)*"
+INTERPOLATED_STRING := `([^`{\\]|\\.|{[^}]*})*`
 
-### Core Types
-`file`, `str`, `list`, `dict`, `slice`, `struct`, `void`, `enum`, `path`, `error`, `uword`
+// Comments
+LINE_COMMENT := //[^\n]*
+BLOCK_COMMENT := /\*([^*]|\*[^/])*\*/
+DOC_COMMENT := ///[^\n]*
+```
 
-### Variable Qualifiers
-`const`, `static`, `private`, `secret`, `volatile`, `atomic`, `register`, `simd`
+### Syntax Grammar (EBNF)
 
-### C Interop
-`extern`, `export`  
+```ebnf
+program := (declaration | import_statement)*
 
-### OOP Constructs
-`trait`, `impl`, `type`, `this`, `super`
+declaration := function_declaration
+             | struct_declaration  
+             | enum_declaration
+             | error_declaration
+             | trait_declaration
+             | impl_declaration
+             | variable_declaration
+             | alias_declaration
 
-### Namespacing
-`std`, `namespace`
+function_declaration := qualifier* return_type "=" IDENTIFIER generic_params? 
+                       "(" parameter_list? ")" "{" statement* "}"
 
-### Built-in Functions/Streams
-`printf`, `debugf`, `assert`, `stdout`, `stdin`, `stderr`
+struct_declaration := "struct" IDENTIFIER inheritance? "{" struct_member* "}"
+
+inheritance := "(" type_list ")"
+
+type_list := type ("," type)*
+
+statement := expression_statement
+           | control_statement
+           | declaration
+           | block_statement
+
+expression := assignment_expression
+
+assignment_expression := ownership_expression (("=" | ":=") ownership_expression)*
+
+ownership_expression := logical_or_expression
+
+// ... (additional grammar rules)
+```
+
+### Type System Grammar
+
+```ebnf
+type := primitive_type
+      | array_type
+      | pointer_type
+      | function_type
+      | generic_type
+      | qualified_type
+
+primitive_type := "u8" | "u16" | "u32" | "u64" | "uword"
+                | "i8" | "i16" | "i32" | "i64"
+                | "f32" | "f64"
+                | "void" | "str" | "path"
+
+array_type := type "[" expression? "]"
+
+pointer_type := "#" type
+
+qualified_type := qualifier+ type
+
+qualifier := "const" | "static" | "private" | "secret" 
+           | "volatile" | "atomic" | "register" | "simd"
+```
 
 ## Compilation Model
-- Ahead-of-time compilation to native code
-- Static dispatch only (no virtual functions)
-- Compile-time generics instantiation  
-- Multiple dispatch resolution at compile time
-- Target: C ABI compatibility
-- Backend: Zig-based code generation (initially)
 
-## File Extensions
-- Source files: `.cesium` or `.cs`
-- Module interface files: `.m`
-- Generated C headers: `.h` (optional, via compiler flag)
+### Build Process
+
+1. **Lexical Analysis**: Source code tokenization
+1. **Parsing**: Abstract syntax tree generation with error recovery
+1. **Semantic Analysis**: Type checking, borrow checking, trait resolution
+1. **Generic Instantiation**: Monomorphization of generic functions and types
+1. **Optimization**: Dead code elimination, inlining, constant propagation
+1. **Code Generation**: Translation to Zig intermediate representation
+1. **Backend Compilation**: Zig compilation to native machine code
+
+### Compilation Targets
+
+- **Primary Backend**: Zig compiler infrastructure
+- **Output Formats**: Native executables, static libraries, dynamic libraries
+- **Platform Support**: x86-64, ARM64, with extensibility for additional architectures
+- **ABI Compatibility**: C calling conventions and data layout
+
+### Compile-Time Features
+
+```cesium
+// Compile-time code execution
+comptime {
+    const BUILD_VERSION = get_git_commit();
+    const OPTIMIZATION_LEVEL = 3;
+    
+    if (target_arch == "x86_64") {
+        enable_sse_optimizations();
+    }
+}
+
+// Conditional compilation
+comptime {
+    if (debug_mode) {
+        add_bounds_checking();
+        enable_memory_tracking();
+    }
+}
+
+// Generic specialization
+generic<T> void = print_value(T value) {
+    comptime {
+        if (typeof(T) == "f64" || typeof(T) == "f32") {
+            printf("{:.6f}\n", value);
+        } else {
+            printf("{}\n", value);
+        }
+    }
+}
+```
+
+### Error Messages and Diagnostics
+
+```cesium
+// Compile-time error examples:
+
+// Type mismatch
+i32 x = 3.14;  // Error: Cannot assign f64 to i32, use explicit conversion
+
+// Ownership violation
+Matrix m := create_matrix();
+Matrix copy = m;  // Error: Cannot copy owned value, use move() or borrow
+
+// Borrow checker violation
+~Matrix writer = ~m;
+#Matrix reader = #m;  // Error: Cannot create immutable borrow while mutable borrow exists
+
+// Use after move
+Matrix a := create_matrix();
+Matrix b := move(a);
+f64 det = determinant(#a);  // Error: Use of moved value 'a'
+```
 
 ## Standard Library Organization
-Mathematical functions, container operations, and I/O utilities accessible via `std.builtin` namespace when shadowed by user definitions.
+
+### Module Structure
+
+```cesium
+// Core modules (automatically available)
+std.builtin    // Built-in functions when shadowed
+std.memory     // Advanced memory management (allocators, arenas)
+std.math       // Extended mathematical functions
+std.string     // String manipulation utilities
+std.collections // Advanced container types
+std.io         // File and stream I/O
+std.os         // Operating system interfaces
+std.thread     // Concurrency primitives
+std.simd       // SIMD intrinsics and utilities
+```
+
+### Example Standard Library Usage
+
+```cesium
+// Using standard library containers
+import(std.collections) { HashMap; ArrayList }
+
+HashMap[str, i32] word_count;
+ArrayList[str] lines;
+
+// Advanced memory management
+import(std.memory) { ArenaAllocator; PoolAllocator }
+
+ArenaAllocator arena;
+#f64 temp_data = arena.alloc(1000);
+// arena automatically frees all allocations when destroyed
+
+// Extended math functions
+import(std.math) { pow; log; exp }
+
+f64 result = pow(base, exponent);
+f64 natural_log = log(value);
+```
+
+## File Extensions and Project Structure
+
+### File Extensions
+
+- **Source files**: `.cesium` or `.cs`
+- **Module interface files**: `.m`
+- **Generated C headers**: `.h` (via `--generate-headers` compiler flag)
+
+### Project Structure Example
+
+```
+project/
+├── src/
+│   ├── main.cesium           # Main entry point
+│   ├── math/
+│   │   ├── vector.cesium     # Vector implementation
+│   │   ├── matrix.cesium     # Matrix implementation
+│   │   └── quaternion.cesium # Quaternion implementation
+│   └── graphics/
+│       ├── renderer.cesium   # Rendering engine
+│       └── primitives.cesium # Basic shapes
+├── include/
+│   ├── math.m               # Math module interface
+│   └── graphics.m           # Graphics module interface
+├── build/
+│   ├── debug/               # Debug build artifacts
+│   └── release/             # Release build artifacts
+└── cesium.toml              # Project configuration
+```
+
+### Build Configuration
+
+```toml
+# cesium.toml
+[project]
+name = "math_engine"
+version = "1.0.0"
+authors = ["Developer Name"]
+
+[build]
+target = "native"
+optimization = "fast"
+debug_info = true
+
+[dependencies]
+blas = { version = "3.8", system = true }
+opengl = { version = "4.6", system = true }
+
+[features]
+simd = true
+parallel = true
+```
+
+## Performance Considerations
+
+### Memory Layout and Alignment
+
+```cesium
+// Explicit memory layout control
+struct AlignedData {
+    f64 values[4] align(32);  // 32-byte alignment for SIMD
+    u8 flags[16] pack(1);     // Pack without padding
+}
+
+// Cache-friendly data structures
+struct Matrix {
+    simd f64 data[64] align(64);  // Align to cache line
+    uword rows, cols;
+}
+```
+
+### Optimization Hints
+
+```cesium
+// Loop optimization hints
+for (uword i = 0..size) {
+    comptime unroll(4);  // Unroll loop by factor of 4
+    result[i] = data[i] * scale;
+}
+
+// Function inlining
+inline f64 = fast_multiply(f64 a, f64 b) {
+    return a * b;
+}
+
+// Branch prediction hints
+if likely(common_condition) {
+    handle_common_case();
+} else {
+    handle_rare_case();
+}
+```
+
+## Conclusion
+
+Cesium provides a modern, performance-oriented programming language specifically designed for mathematical computing while maintaining systems programming capabilities. The language emphasizes:
+
+- **Explicit control** over memory management and performance characteristics
+- **Mathematical expressiveness** through context-aware operators and built-in mathematical types
+- **Memory safety** through ownership tracking and compile-time borrow checking
+- **Interoperability** with existing C libraries and systems
+- **Predictable performance** through static dispatch and ahead-of-time compilation
+
+The language strikes a balance between safety and performance, providing developers with the tools needed for both rapid mathematical prototyping and production systems development.
