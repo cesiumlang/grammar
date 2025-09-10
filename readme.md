@@ -281,11 +281,35 @@ difference = a - b;
 shifted = value << 2;
 shifted = value >> 1;
 
-// 11-16. Comparison and logical operators
-// 17. Custom binary operators
+// 11. Comparison operators
+less = a < b;
+greater = a > b;
+less_equal = a <= b;
+greater_equal = a >= b;
+
+// 12. Equality operators
+equal = a == b;
+not_equal = a != b;
+
+// 13. Bitwise AND
+masked = value & 0xFF;
+
+// 14. Bitwise XOR
+flipped = a >< b;
+
+// 15. Bitwise OR
+combined = flags | new_flag;
+
+// 16. Logical AND
+result = condition1 && condition2;
+
+// 17. Logical OR
+result = condition1 || condition2;
+
+// 18. Custom binary operators
 result = a $dot$ b;      // custom binary operator
 
-// 18. Assignment
+// 19. Assignment
 x = 42;
 owned := create_value();
 ```
@@ -311,7 +335,24 @@ vector[3] v = A * v1;           // matrix-vector multiplication
 vector[3] scaled = 2.0 * v1;    // scalar-vector multiplication
 ```
 
-### Pointer Operations and Contexts
+### Bitwise Operations
+
+```cesium
+u32 flags = 0b11110000;
+u32 mask = 0b00001111;
+
+u32 masked = flags & mask;        // bitwise AND
+u32 flipped = flags >< 0b11111111; // bitwise XOR (toggle bits)
+u32 combined = flags | mask;       // bitwise OR
+u32 shifted_left = flags << 2;     // left shift
+u32 shifted_right = flags >> 2;    // right shift
+
+// XOR for encryption/decryption
+u8 data = 0x42;
+u8 key = 0x5A;
+u8 encrypted = data >< key;        // encrypt
+u8 decrypted = encrypted >< key;   // decrypt (data == decrypted)
+```
 
 ```cesium
 i32 value = 42;
@@ -1475,3 +1516,8 @@ Cesium provides a modern, performance-oriented programming language specifically
 - **Predictable performance** through static dispatch and ahead-of-time compilation
 
 The language strikes a balance between safety and performance, providing developers with the tools needed for both rapid mathematical prototyping and production systems development.
+
+-----
+
+*Cesium Language Specification v0.1*  
+*This document serves as the complete language definition for implementing a Cesium compiler prototype.*
