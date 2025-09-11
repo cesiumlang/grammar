@@ -5,3 +5,13 @@ EBNF
 Monomorphization
 inlining
 Zig
+bigz
+EBNF
+Monomorphization
+Namespacing
+shadowable
+unistd
+vaddps
+variadics
+vmovups
+Zig

@@ -4,18 +4,25 @@
     ".cspell/cesium/cspell-ext.json"
   ],
   "ignorePaths": [
-    ".cspell.json",
+    ".cspell.jsonc",
     ".cspell/**",
     ".git/**",
     "*.code-workspace",
     ".local-gitignore"
   ],
-  "dictionaryDefinitions": [],
+  "dictionaryDefinitions": [
+    {
+      "name": "project-words",
+      "path": ".vscode/ltex.dictionary.en-US.txt",
+      "addWords": true
+    }
+  ],
   "dictionaries": [
     "bash",
     "win32",
     "scientific-terms-us",
-    "cesium"
+    "cesium",
+    "project-words",
   ],
   "words": [
     "CMake",
