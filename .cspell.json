@@ -1,0 +1,29 @@
+{
+  "version": "0.2",
+  "import": [
+    ".cspell/cesium/cspell-ext.json"
+  ],
+  "ignorePaths": [
+    ".cspell.json",
+    ".cspell/**",
+    ".git/**",
+    "*.code-workspace",
+    ".local-gitignore"
+  ],
+  "dictionaryDefinitions": [],
+  "dictionaries": [
+    "bash",
+    "win32",
+    "scientific-terms-us",
+    "cesium"
+  ],
+  "words": [
+    "CMake",
+  ],
+  "ignoreWords": [
+
+  ],
+  "ignoreRegExpList": [
+    "/-D.*/"
+  ]
+}

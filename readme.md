@@ -3,23 +3,27 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-1. [Lexical Structure](#lexical-structure)
-1. [Type System](#type-system)
-1. [Variables and Constants](#variables-and-constants)
-1. [Operators and Expressions](#operators-and-expressions)
-1. [Control Flow](#control-flow)
-1. [Functions](#functions)
-1. [Memory Management](#memory-management)
-1. [Object-Oriented Programming](#object-oriented-programming)
-1. [Error Handling](#error-handling)
-1. [Modules and Imports](#modules-and-imports)
-1. [Built-in Functions](#built-in-functions)
-1. [Inline Assembly](#inline-assembly)
-1. [Grammar Reference](#grammar-reference)
+2. [Lexical Structure](#lexical-structure)
+3. [Type System](#type-system)
+4. [Variables and Constants](#variables-and-constants)
+5. [Operators and Expressions](#operators-and-expressions)
+6. [Control Flow](#control-flow)
+7. [Functions](#functions)
+8. [Memory Management](#memory-management)
+9. [Object-Oriented Programming](#object-oriented-programming)
+10. [Error Handling](#error-handling)
+11. [Modules and Imports](#modules-and-imports)
+12. [Built-in Functions](#built-in-functions)
+13. [Inline Assembly](#inline-assembly)
+14. [Grammar Reference](#grammar-reference)
 
 ## Overview
 
 Cesium is a compiled, statically-typed systems programming language designed for mathematical computing and linear algebra applications. It prioritizes performance, explicit memory management, and mathematical expressiveness while maintaining C ABI compatibility.
+
+The language borrows design and syntactic elements from languages as varied as Python, Fortran, Rust, Go, Odin, and C++, but ultimately derives the bulk of its original design inspiration and goals from C, Zig, and MATLAB.  As such, an early placeholder name for the language was CZM for those three languages.
+
+Ultimately, the name is a reference to the atomic element cesium (American Chemical Society spelling).  Since one of the primary objectives of the language is runtime performance, it seemed fitting to share a name with the primary element used for standard atomic clocks.  In fact, a second in timekeeping is officially defined in SI by assuming the unperturbed ground-state hyperfine transition frequency of the cesium-133 atom to be exactly 9,192,631,770 Hz.  It takes 34 bits to represent that number as an integer in binary.
 
 ### Design Goals
 
@@ -33,7 +37,7 @@ Cesium is a compiled, statically-typed systems programming language designed for
 ### Basic Program Structure
 
 ```cesium
-// hello.cesium
+// hello.cs
 void = main() {
     printf("Hello, Cesium!\n");
 }
@@ -61,15 +65,13 @@ void = documented_function() {
 
 Cesium reserves the following keywords:
 
+**Core Types:** `file`, `str`, `list`, `dict`, `slice`, `struct`, `path`, `uword`
+
+**Language Constructs:** `alias`, `catch`, `as`, `return`, `comptime`, `generic`, `sizeof`, `typeof`, `asm`, `void`, `enum`, `error`, `null`, `union`
+
 **Control Flow:** `if`, `while`, `for`, `else`, `do`, `with`, `defer`, `break`, `continue`, `switch`, `case`, `fallthrough`, `throw`
 
 **Function Qualifiers:** `operator`, `context`, `property`, `private`, `secret`, `static`, `destruct`
-
-**Language Constructs:** `alias`, `catch`, `as`, `return`, `comptime`, `generic`, `sizeof`, `typeof`, `asm`
-
-**Memory Management:** `alloc`, `free`, `realloc`
-
-**Core Types:** `file`, `str`, `list`, `dict`, `slice`, `struct`, `void`, `enum`, `path`, `error`, `uword`, `null`
 
 **Variable Qualifiers:** `const`, `static`, `private`, `secret`, `volatile`, `atomic`, `register`, `simd`
 
@@ -79,7 +81,13 @@ Cesium reserves the following keywords:
 
 **Namespacing:** `std`, `namespace`
 
-**Built-in Functions:** `printf`, `debugf`, `assert`, `stdout`, `stdin`, `stderr`
+### Built-in Functions and Constants
+
+**Memory Management:** `alloc()`, `free()`, `realloc()`
+
+**Debugging and I/O:** `printf()`, `debugf()`, `assert()`, `stdout`, `stdin`, `stderr`
+
+**Mathematical:** `floor()`, `ceil()`, `trunc()`, `round()`, `trueround()`, `abs()`, `min()`, `max()`, `mean()`, `norm()`, `pi`
 
 ### Identifiers
 
@@ -90,7 +98,7 @@ Identifiers follow C-style rules: start with letter or underscore, followed by l
 ```cesium
 str simple = "Hello, world!";
 str interpolated = `Hello, {name}! You have {count} messages.`;
-path file_path = `{home_dir}/config/settings.conf`;
+path file_path = path(`{home_dir}/config/settings.conf`);
 ```
 
 ## Type System
@@ -103,15 +111,19 @@ u8 byte_val = 255;
 u16 short_val = 65535;
 u32 int_val = 4294967295;
 u64 long_val = 18446744073709551615;
+u34 arbitrary_bit_width = 9192631770;
 
 i8 signed_byte = -128;
 i16 signed_short = -32768;
 i32 signed_int = -2147483648;
 i64 signed_long = -9223372036854775808;
+i34 signed_arbitrary_bit_width = -9192631770;
 
 // Floating point
-f32 single = 3.14f;
+f16 small_float = 3.14;
+f32 single = 3.14159;
 f64 double = 3.141592653589793;
+f128 quad;
 
 // Word-sized integer (pointer-sized)
 uword size = 1024;
@@ -119,6 +131,7 @@ uword size = 1024;
 // No separate bool or char - use u8
 u8 is_valid = 1;  // true
 u8 letter = 65;   // 'A'
+u8 also_letter = 'A';
 ```
 
 ### Array Types
@@ -129,7 +142,7 @@ i32 numbers[10];
 f64 matrix[3][3];  // 3x3 matrix
 
 // Array type syntax (for function parameters)
-void = process_data(f64[] values, uword count);
+void = process_data(f64 values[], uword count);
 
 // Dynamic arrays
 list[i32] dynamic_numbers;
@@ -151,13 +164,15 @@ result = a + b;  // vectorized addition
 ### Pointer Types
 
 ```cesium
-#i32 int_ptr;         // pointer to i32
-##i32 ptr_to_ptr;     // pointer to pointer to i32
+#i32 int_ptr;         // immutable pointer to i32
+##i32 ptr_to_ptr;     // immutable pointer to immutable pointer to i32
+~#i32 mut_ptr_to_ptr; // mutable pointer to immutable pointer to i32
+#~i32 ptr_to_mut_ptr; // immutable pointer to mutable pointer to i32
 
 // Ownership and borrowing
-Matrix m := create_matrix();     // owned value
-#Matrix borrowed = #m;           // immutable borrow  
-~Matrix mutable = ~m;            // mutable borrow
+#Matrix m := create_matrix();     // owned value
+#Matrix borrowed_m #= m;         // immutable borrow
+~Matrix mutable_m #= m;          // mutable borrow
 ```
 
 ### User-Defined Types
@@ -171,7 +186,7 @@ struct Point {
 
 // Enums with custom backing types
 enum Status { OK; ERROR; PENDING; }
-enum i16 ErrorCode { FILE_NOT_FOUND = -1; ACCESS_DENIED = -2; }
+enum i16 ImportantYears { Y2K = 2000; TWO_BC = -1; }
 
 // Error types
 error FileNotFound {
@@ -179,17 +194,25 @@ error FileNotFound {
     i32 errno;
 }
 
-// Union types via aliases
-alias Number = i32|f64;
-alias Result = Matrix|FileNotFound;
+// Union types
+union Number = i32|f64;
+union FileErrors = AccessDenied|FileNotFound;
 ```
 
 ### Type Conversion Rules
 
 ```cesium
-// Implicit promotions (safe)
+// Implicit promotions
 i32 x = 42;
-f64 y = x;           // i32 → f64 OK
+i34 y = x; // widening of same numeric class
+f32 z = x;
+f64 bigz = x; // int-to-float + widening
+
+u32 a = 96;
+u64 b = a; // widening of same numeric class
+f64 c = a; // int-to-float + widening
+
+f128 d = c; // widening of same numeric class
 
 // Explicit conversions for narrowing
 f64 pi = 3.14159;
@@ -209,6 +232,9 @@ i16 medium = 255;    // 255 becomes i16
 ### Variable Declaration
 
 ```cesium
+// Basic declaration with no initialization
+u8 x;
+
 // Basic declaration with initialization
 i32 count = 0;
 f64 pi = 3.14159;
@@ -218,9 +244,9 @@ const i32 MAX_SIZE = 1000;
 const str VERSION = "1.0.0";
 
 // Ownership assignment
-Matrix owned := create_matrix();  // takes ownership
-Matrix copy = owned;              // error - cannot copy owned value
-Matrix moved := move(owned);      // explicit ownership transfer
+Matrix m_owned := create_matrix();  // takes ownership
+Matrix m_copy = owned;              // error - cannot copy owned value
+Matrix m_moved := owned;      // explicit ownership transfer
 ```
 
 ### Qualifiers
@@ -231,7 +257,7 @@ static i32 global_counter = 0;    // function-scoped persistence
 private void = helper();          // module-internal function
 secret i32 internal_state;       // class-internal only
 
-// Hardware qualifiers  
+// Hardware qualifiers
 volatile u32 hardware_register;   // prevent optimization
 atomic u64 shared_counter;        // thread-safe operations
 register u64 hot_variable;        // register allocation hint
@@ -250,7 +276,7 @@ member = obj.field;       // member access
 // 2. Custom unary operators
 result = $negate$x;       // custom unary operator
 
-// 3. Postfix operators  
+// 3. Postfix operators
 transposed = matrix~;     // matrix transpose
 
 // 4. Unary prefix operators
@@ -321,7 +347,7 @@ owned := create_value();
 f64 scalar = 2.0;
 f64 result = scalar * 3.14;
 
-// Vector operations  
+// Vector operations
 vector[3] v1, v2;
 f64 dot_product = v1 * v2;      // dot product
 vector[3] cross_product = v1 @ v2;  // cross product
@@ -353,6 +379,8 @@ u8 key = 0x5A;
 u8 encrypted = data >< key;        // encrypt
 u8 decrypted = encrypted >< key;   // decrypt (data == decrypted)
 ```
+
+### Pointer Operations and Contexts
 
 ```cesium
 i32 value = 42;
@@ -431,7 +459,7 @@ switch (value) {
 
 // Optional fallthrough
 fallthrough switch (status) {
-    case (STARTING) { 
+    case (STARTING) {
         initialize();
         // falls through
     }
@@ -447,7 +475,7 @@ fallthrough switch (status) {
 // Type matching
 Number num = get_number();  // Number = i32|f64
 switch (typeof(num)) {
-    case (i32) { 
+    case (i32) {
         i32 val = num as i32;
         printf("Integer: {}\n", val);
     }
@@ -509,17 +537,17 @@ Matrix = create_matrix(i32 rows, i32 cols) {
 ```cesium
 struct Calculator {
     private f64 last_result;
-    
+
     // Static method (no 'this' parameter)
     static Calculator = create() {
         return Calculator { last_result = 0.0 };
     }
-    
+
     // Private method (module internal)
     private void = validate_input(f64 value) {
         assert(value >= 0.0);
     }
-    
+
     // Secret method (class internal only)
     secret void = internal_operation() {
         // implementation details
@@ -581,7 +609,7 @@ extern libc = import('c') {
 // Built-in operator overloading
 struct Vector3 {
     f64 x, y, z;
-    
+
     // Overload addition operator
     Vector3 = operator +(Vector3 other) {
         return Vector3 {
@@ -590,7 +618,7 @@ struct Vector3 {
             z = this.z + other.z
         };
     }
-    
+
     // Overload multiplication for dot product
     f64 = operator *(Vector3 other) {
         return this.x * other.x + this.y * other.y + this.z * other.z;
@@ -640,11 +668,11 @@ copy(destination, source, count); // built-in memory copy
 void = process_file(str filename) {
     #u8 buffer = alloc(1024);
     defer free(buffer);           // executed when function returns
-    
+
     if (some_condition) {
         return;  // defer executes here
     }
-    
+
     // defer also executes at normal function end
 }
 
@@ -654,7 +682,7 @@ void = complex_processing() {
         cleanup_temp_files();
         reset_global_state();
     };
-    
+
     // multiple operations deferred together
 }
 ```
@@ -678,8 +706,8 @@ void = read_config() {
         process_config(data);
         // file automatically closed on exit
     } catch (err) {
-        case (FileNotFound) { 
-            printf("Config file not found\n"); 
+        case (FileNotFound) {
+            printf("Config file not found\n");
         }
     }
 }
@@ -689,7 +717,7 @@ void = read_config() {
 
 ```cesium
 // Ownership transfer
-Matrix create_identity(i32 size) {
+Matrix = create_identity(i32 size) {
     Matrix result := allocate_matrix(size, size);  // owned
     // ... initialize
     return result;  // ownership transferred to caller
@@ -724,29 +752,29 @@ struct Point {
     f64 y = 0.0;
     private f64 internal_id;     // accessible to subclasses
     secret f64 truly_private;    // not accessible to subclasses
-    
+
     // Constructor
     Point(f64 px, f64 py) {
         x = px;
         y = py;
         internal_id = generate_id();
     }
-    
+
     // Destructor
     destruct Point() {
         cleanup_resources();
     }
-    
+
     // Static method
     static Point = origin() {
         return Point(0.0, 0.0);
     }
-    
+
     // Instance method
     f64 = distance_from_origin() {
         return ::(x^2 + y^2);  // sqrt of sum of squares
     }
-    
+
     // Method with mutable access
     void = translate(f64 dx, f64 dy) {
         x += dx;
@@ -767,17 +795,17 @@ p1.translate(1.0, -1.0);
 // Single inheritance
 struct Point3D(Point) {
     f64 z = 0.0;
-    
+
     Point3D(f64 px, f64 py, f64 pz) {
         super Point(px, py);  // call parent constructor
         z = pz;
     }
-    
+
     destruct Point3D() {
         // local cleanup
         super ~Point();       // call parent destructor
     }
-    
+
     // Override parent method
     f64 = distance_from_origin() {
         return ::(x^2 + y^2 + z^2);
@@ -790,7 +818,7 @@ struct ColoredPoint(Point, Colored) {
         super Point(x, y);     // left-to-right constructor calls
         super Colored(c);
     }
-    
+
     // Method resolution override (use Point's version instead of Colored's)
     str = Point.to_string;
 }
@@ -801,19 +829,19 @@ struct ColoredPoint(Point, Colored) {
 ```cesium
 struct Circle {
     private f64 radius;
-    
+
     // Getter property
     f64 = property area() {
         return 3.14159 * radius^2;
     }
-    
+
     // Setter property (returns assigned value for chaining)
     f64 = property.set radius(f64 r) {
         assert(r >= 0.0);
         this.radius = r;
         return r;  // enables: x = circle.radius = 5.0
     }
-    
+
     // Read-only property (getter only)
     f64 = property circumference() {
         return 2.0 * 3.14159 * radius;
@@ -834,7 +862,7 @@ f64 area = c.area;           // calls getter
 trait Drawable {
     void = draw();
     void = resize(f64 scale);
-    
+
     // Default implementation
     void = highlight() {
         printf("Highlighting drawable object\n");
@@ -850,11 +878,11 @@ impl Drawable(Circle) {
     void = draw() {
         printf("Drawing circle with radius {}\n", this.radius);
     }
-    
+
     void = resize(f64 scale) {
         this.radius *= scale;
     }
-    
+
     // highlight() uses default implementation
 }
 
@@ -910,7 +938,7 @@ FileError|file = open_file(str path) {
     if (!has_permission(path)) {
         return AccessDenied { message = "Read permission denied", permission_level = 0 };
     }
-    
+
     file handle = create_file_handle(path);
     return handle;  // success case
 }
@@ -922,12 +950,12 @@ void = batch_process_files(str[] file_paths) {
             throw FileNotFound { path = path, errno = 404 };
             continue;  // process remaining files
         }
-        
+
         if (!check_permissions(path)) {
             throw AccessDenied { message = "Cannot access file", permission_level = 1 };
             continue;
         }
-        
+
         process_single_file(path);
     }
     // All thrown errors handled by catch after function completes
@@ -1011,7 +1039,7 @@ namespace math.vector;
 // Public interface
 struct Vector3 {
     f64 x, y, z;
-    
+
     Vector3 = operator +(Vector3 other) {
         return Vector3 { x + other.x, y + other.y, z + other.z };
     }
@@ -1036,9 +1064,9 @@ import(std.io) as io;
 
 // Selective imports
 import(math.matrix) { Matrix; multiply as mat_mult; invert };
-import(graphics.primitives) { 
-    Circle; 
-    Rectangle as Rect; 
+import(graphics.primitives) {
+    Circle;
+    Rectangle as Rect;
     export Triangle;  // import as global name
 }
 
@@ -1245,7 +1273,7 @@ DOC_COMMENT := ///[^\n]*
 program := (declaration | import_statement)*
 
 declaration := function_declaration
-             | struct_declaration  
+             | struct_declaration
              | enum_declaration
              | error_declaration
              | trait_declaration
@@ -1253,7 +1281,7 @@ declaration := function_declaration
              | variable_declaration
              | alias_declaration
 
-function_declaration := qualifier* return_type "=" IDENTIFIER generic_params? 
+function_declaration := qualifier* return_type "=" IDENTIFIER generic_params?
                        "(" parameter_list? ")" "{" statement* "}"
 
 struct_declaration := "struct" IDENTIFIER inheritance? "{" struct_member* "}"
@@ -1297,7 +1325,7 @@ pointer_type := "#" type
 
 qualified_type := qualifier+ type
 
-qualifier := "const" | "static" | "private" | "secret" 
+qualifier := "const" | "static" | "private" | "secret"
            | "volatile" | "atomic" | "register" | "simd"
 ```
 
@@ -1306,16 +1334,16 @@ qualifier := "const" | "static" | "private" | "secret"
 ### Build Process
 
 1. **Lexical Analysis**: Source code tokenization
-1. **Parsing**: Abstract syntax tree generation with error recovery
-1. **Semantic Analysis**: Type checking, borrow checking, trait resolution
-1. **Generic Instantiation**: Monomorphization of generic functions and types
-1. **Optimization**: Dead code elimination, inlining, constant propagation
-1. **Code Generation**: Translation to Zig intermediate representation
-1. **Backend Compilation**: Zig compilation to native machine code
+2. **Parsing**: Abstract syntax tree generation with error recovery
+3. **Semantic Analysis**: Type checking, borrow checking, trait resolution
+4. **Generic Instantiation**: Monomorphization of generic functions and types
+5. **Optimization**: Dead code elimination, inlining, constant propagation
+6. **Code Generation**: Translation to LLVM intermediate representation
+7. **Backend Compilation**: LLVM compilation to native machine code
 
 ### Compilation Targets
 
-- **Primary Backend**: Zig compiler infrastructure
+- **Primary Backend**: LLVM compiler infrastructure
 - **Output Formats**: Native executables, static libraries, dynamic libraries
 - **Platform Support**: x86-64, ARM64, with extensibility for additional architectures
 - **ABI Compatibility**: C calling conventions and data layout
@@ -1327,7 +1355,7 @@ qualifier := "const" | "static" | "private" | "secret"
 comptime {
     const BUILD_VERSION = get_git_commit();
     const OPTIMIZATION_LEVEL = 3;
-    
+
     if (target_arch == "x86_64") {
         enable_sse_optimizations();
     }
@@ -1377,7 +1405,7 @@ f64 det = determinant(#a);  // Error: Use of moved value 'a'
 
 ## Standard Library Organization
 
-### Module Structure
+### Standard Library Modules
 
 ```cesium
 // Core modules (automatically available)
@@ -1425,7 +1453,7 @@ f64 natural_log = log(value);
 
 ### Project Structure Example
 
-```
+```text
 project/
 ├── src/
 │   ├── main.cesium           # Main entry point
@@ -1519,8 +1547,3 @@ Cesium provides a modern, performance-oriented programming language specifically
 - **Predictable performance** through static dispatch and ahead-of-time compilation
 
 The language strikes a balance between safety and performance, providing developers with the tools needed for both rapid mathematical prototyping and production systems development.
-
------
-
-*Cesium Language Specification v0.1*  
-*This document serves as the complete language definition for implementing a Cesium compiler prototype.*
