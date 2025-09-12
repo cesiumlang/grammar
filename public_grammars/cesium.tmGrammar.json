@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "cesium",
   "scopeName": "source.cesium",
   "fileTypes": [
@@ -111,9 +111,9 @@
           "name": "meta.field.cesium",
           "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*=\\s*([^;]+))?;",
           "captures": {
-            "1": {"name": "storage.type.cesium"},
-            "2": {"name": "variable.other.member.cesium"},
-            "3": {"name": "constant.other.cesium"}
+            "1": { "name": "storage.type.cesium" },
+            "2": { "name": "variable.other.member.cesium" },
+            "3": { "name": "constant.other.cesium" }
           }
         }
       ]
@@ -171,7 +171,7 @@
           "begin": "\"",
           "end": "\"",
           "patterns": [
-            {"name": "constant.character.escape.cesium", "match": "\\\\[\"'\\\\nrt0]" },
+            { "name": "constant.character.escape.cesium", "match": "\\\\[\"'\\\\nrt0]" },
             { "name": "constant.character.escape.unicode.cesium", "match": "\\\\u\\{[0-9a-fA-F]+\\}" }
           ]
         },
@@ -232,7 +232,7 @@
         { "name": "keyword.operator.ownership.cesium", "match": "#=|:=" },
         { "name": "keyword.operator.range.cesium", "match": "\\.\\.=?|\\?\\?" },
         { "name": "keyword.operator.comparison.cesium", "match": "==|!=|<=|>=|<|>" },
-        { "name": "keyword.operator.logical.cesium", "match": "&&|\\|\\||" },
+        { "name": "keyword.operator.logical.cesium", "match": "&&|\\|\\||!" },
         { "name": "keyword.operator.bitwise.cesium", "match": "&|\\||><|<<|>>" },
         { "name": "keyword.operator.string.cesium", "match": "\\*\\*" },
         { "name": "keyword.operator.arithmetic.cesium", "match": "\\+\\+|\\-\\-|\\+|\\-|::|@|\\*|\\/|%|\\^" },
