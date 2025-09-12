@@ -2,6 +2,8 @@ import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
 import { QuartzTransformerPlugin } from "./quartz/plugins/types"
 import rehypePrettyCode from "rehype-pretty-code"
+import * as fs from "fs"
+import * as path from "path"
 
 // Custom Cesium Syntax Highlighting Plugin
 const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) => {
@@ -59,84 +61,31 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               }
             },
             ...userOpts,
-            // Custom getHighlighter function for Cesium language support
-            getHighlighter: async (options: any) => {
-              console.log("🔍 CesiumSyntaxHighlighting: getHighlighter called")
-              console.log("📋 Options received:", JSON.stringify(options, null, 2))
-
-              const { getHighlighter } = await import("shiki")
-              const fs = await import("fs")
-              const path = await import("path")
-
-              // Path to the Cesium TextMate grammar file at workspace root.
-              // Don't forget this file in Git is only one level down from the
-              // repo root, but this file gets copied to quartz_repo during
-              // the build action, so the path needs an extra ../ here.
-              const grammarPath = path.resolve("../../cesium.tmGrammar.json")
-              console.log("📁 Looking for grammar at:", grammarPath)
-
-              try {
-                const cesiumGrammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
-                console.log("✅ Cesium grammar loaded successfully!")
-                console.log("📝 Grammar name:", cesiumGrammar.name)
-                console.log("🏷️  Grammar scopeName:", cesiumGrammar.scopeName)
-
-                console.log("🔧 Raw grammar object keys:", Object.keys(cesiumGrammar))
-
-                // Create a proper Shiki language registration
-                const cesiumLang = {
-                  id: 'cesium',
-                  scopeName: 'source.cesium',
-                  grammar: cesiumGrammar,
-                  aliases: ['cesium']
-                }
-
-                console.log("🔧 Cesium language object:", JSON.stringify({
-                  id: cesiumLang.id,
-                  scopeName: cesiumLang.scopeName,
-                  aliases: cesiumLang.aliases,
-                  hasGrammar: !!cesiumLang.grammar
-                }, null, 2))
-
-                const highlighter = await getHighlighter({
-                  ...options,
-                  langs: [
-                    ...(options.langs || []),
-                    cesiumLang
-                  ]
-                })
-
-                // Try to load the language explicitly
-                try {
-                  await highlighter.loadLanguage(cesiumGrammar)
-                  console.log("✅ Explicitly loaded cesium language")
-                } catch (loadError) {
-                  console.warn("⚠️  Failed to explicitly load cesium:", loadError)
-                }
-
-                console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
-
-                // Test if cesium language is actually available
-                try {
-                  const testCode = "const x: i32 = 42;"
-                  const highlighted = highlighter.codeToHtml(testCode, {
-                    lang: 'cesium',
-                    themes: {
-                      light: 'github-light',
-                      dark: 'github-dark'
-                    }
-                  })
-                  console.log("🧪 Test highlighting successful for cesium language")
-                } catch (testError) {
-                  console.warn("⚠️  Test highlighting failed:", testError)
-                }
-
-                return highlighter
-              } catch (error) {
-                console.warn("❌ Failed to load Cesium grammar, using default languages:", error)
-                return await getHighlighter(options)
+            // Pre-register cesium language so it's available during markdown parsing
+            langs: [
+              'plaintext', // default
+              {
+                id: 'cesium',
+                scopeName: 'source.cesium',
+                grammar: (() => {
+                  try {
+                    // Path to the Cesium TextMate grammar file at workspace root.
+                    // Don't forget this file in Git is only one level down from the
+                    // repo root, but this file gets copied to quartz_repo during
+                    // the build action, so the path needs an extra ../ here.
+                    const grammarPath = path.resolve('../../cesium.tmGrammar.json')
+                    console.log("📁 Pre-loading grammar from:", grammarPath)
+                    const grammar = JSON.parse(fs.readFileSync(grammarPath, 'utf-8'))
+                    console.log("✅ Pre-loaded cesium grammar successfully!")
+                    return grammar
+                  } catch (error) {
+                    console.warn("❌ Failed to pre-load cesium grammar:", error)
+                    return null
+                  }
+                })(),
+                aliases: ['cesium']
               }
-            },
+            ].filter(lang => typeof lang === 'string' || (lang && lang.grammar)),
           }
         ]
       ]
