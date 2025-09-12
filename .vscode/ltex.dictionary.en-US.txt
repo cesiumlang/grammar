@@ -27,3 +27,4 @@ Variadic
 variadics
 vmovups
 Zig
+lexer

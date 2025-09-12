@@ -20,8 +20,9 @@
         "strings": false
       }
     },
-    "foam.edit.linkReferenceDefinitions": "off",
     "files.insertFinalNewline": true,
+    "foam.openDailyNote.onStartup": false,
+    "foam.edit.linkReferenceDefinitions": "off",
     "foam.files.ignore": [
       "readme.md",
       "docs/quartz/**/*",

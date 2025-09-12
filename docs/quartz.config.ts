@@ -17,20 +17,44 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               dark: "github-dark",
             },
             keepBackground: true,
+            onVisitHighlightedWord(node: any) {
+              console.log("📝 Processing highlighted word:", node)
+            },
+            transformers: [{
+              name: 'cesium-block-detector',
+              code(node: any) {
+                console.log("🎯 Code block detected:")
+                console.log("  - tagName:", node.tagName)
+                console.log("  - properties:", node.properties)
+                console.log("  - data attributes:", Object.keys(node.properties || {}).filter(k => k.startsWith('data')))
+
+                if (node.properties?.['data-language'] === 'cesium' ||
+                    node.properties?.className?.includes('cesium')) {
+                  console.log("🎉 CESIUM CODE BLOCK FOUND!")
+                }
+              }
+            }],
             onVisitLine(node: any) {
-              // Log when we're processing code lines
-              console.log("🔍 Processing line with className:", node.properties?.className)
-              if (node.properties?.className?.includes('cesium')) {
+              // Log when we're processing code lines - look at data attributes too
+              console.log("🔍 Processing line with:")
+              console.log("  - className:", node.properties?.className)
+              console.log("  - data-language:", node.properties?.['data-language'])
+              console.log("  - all properties:", Object.keys(node.properties || {}))
+
+              if (node.properties?.className?.includes('cesium') ||
+                  node.properties?.['data-language'] === 'cesium') {
                 console.log("🖍️  Processing Cesium code line")
               }
             },
             onVisitHighlightedLine(node: any) {
-              if (node.properties?.className?.includes('cesium')) {
+              if (node.properties?.className?.includes('cesium') ||
+                  node.properties?.['data-language'] === 'cesium') {
                 console.log("✨ Highlighted Cesium code line")
               }
             },
             onVisitHighlightedChars(node: any) {
-              if (node.properties?.className?.includes('cesium')) {
+              if (node.properties?.className?.includes('cesium') ||
+                  node.properties?.['data-language'] === 'cesium') {
                 console.log("🎨 Highlighted Cesium code chars")
               }
             },
