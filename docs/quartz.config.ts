@@ -66,55 +66,36 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
             },
             ...userOpts,
             // Custom getHighlighter function for Cesium language support
+            // see: https://rehype-pretty.pages.dev/#custom-highlighter
             getHighlighter: async (options: any) => {
-              console.log("🔍 CesiumSyntaxHighlighting: getHighlighter called")
-              console.log("📋 Options received:", JSON.stringify(options, null, 2))
+              const { getHighlighter } = await import("shiki")
 
-              const { getSingletonHighlighter } = await import("shiki")
+              return getHighlighter({
+                ...options,
+                langs: [
+                  "plaintext",
+                  // Load cesium grammar as async function following rehype docs pattern
+                  async () => {
+                    // Path to the Cesium TextMate grammar file at workspace root.
+                    // Don't forget this file in Git is only one level down from the
+                    // repo root, but this file gets copied to quartz_repo during
+                    // the build action, so the path needs an extra ../ here.
+                    const grammarPath = path.resolve("../../cesium.tmGrammar.json")
+                    console.log("📁 Loading cesium grammar from:", grammarPath)
 
-              // Path to the Cesium TextMate grammar file at workspace root.
-              // Don't forget this file in Git is only one level down from the
-              // repo root, but this file gets copied to quartz_repo during
-              // the build action, so the path needs an extra ../ here.
-              const grammarPath = path.resolve("../../cesium.tmGrammar.json")
-              console.log("📁 Looking for grammar at:", grammarPath)
-
-              try {
-                const cesiumGrammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
-                console.log("✅ Cesium grammar loaded successfully!")
-                console.log("📝 Grammar name:", cesiumGrammar.name)
-                console.log("🏷️  Grammar scopeName:", cesiumGrammar.scopeName)
-
-                const highlighter = await getSingletonHighlighter({
-                  ...options,
-                  langs: [
-                    ...(options.langs || []),
-                    cesiumGrammar  // Use the grammar directly as rehype-pretty-code expects
-                  ]
-                })
-
-                console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
-
-                // Test if cesium language is actually available
-                try {
-                  const testCode = "const x: i32 = 42;"
-                  const highlighted = highlighter.codeToHtml(testCode, {
-                    lang: 'cesium',
-                    themes: {
-                      light: 'github-light',
-                      dark: 'github-dark'
+                    try {
+                      const grammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
+                      console.log("✅ Cesium grammar loaded successfully!")
+                      console.log("📝 Grammar name:", grammar.name)
+                      console.log("🏷️  Grammar scopeName:", grammar.scopeName)
+                      return grammar
+                    } catch (error) {
+                      console.warn("❌ Failed to load cesium grammar:", error)
+                      throw error
                     }
-                  })
-                  console.log("🧪 Test highlighting successful for cesium language")
-                } catch (testError) {
-                  console.warn("⚠️  Test highlighting failed:", testError)
-                }
-
-                return highlighter
-              } catch (error) {
-                console.warn("❌ Failed to load Cesium grammar, using default languages:", error)
-                return await getSingletonHighlighter(options)
-              }
+                  },
+                ],
+              })
             },
           }
         ]
