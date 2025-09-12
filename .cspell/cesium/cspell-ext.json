@@ -10,7 +10,8 @@
     {
       "name": "cesium",
       "path": "./cesium.txt",
-      "description": "Cesium programming language dictionary."
+      "description": "Cesium programming language dictionary.",
+      "addWords": false
     }
   ],
   // Dictionaries to always be used.
@@ -38,7 +39,7 @@
       // List of dictionaries to enable by name in `dictionaryDefinitions`
       "dictionaries": ["cesium"],
       // Dictionary definitions can also be supplied here. They are only used iff "languageId" and "locale" match.
-      "dictionaryDefinitions": []
+      "dictionaryDefinitions": [],
     }
   ],
   "overrides": [
