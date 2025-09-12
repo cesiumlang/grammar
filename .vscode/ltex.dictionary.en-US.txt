@@ -21,3 +21,8 @@ Variadic
 variadics
 vmovups
 Zig
+intrinsics
+filesystem
+Fallthrough
+Deallocation
+Enums

@@ -6,7 +6,9 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "allowJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
   },
-  "include": ["docs/**/*.ts"]
+  "include": ["docs/**/*.ts", "docs/**/*.tsx"]
 }
