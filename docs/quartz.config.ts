@@ -59,14 +59,36 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
 
                 console.log("🔧 Raw grammar object keys:", Object.keys(cesiumGrammar))
 
+                // Create a proper Shiki language registration
+                const cesiumLang = {
+                  id: 'cesium',
+                  scopeName: 'source.cesium',
+                  grammar: cesiumGrammar,
+                  aliases: ['cesium']
+                }
+
+                console.log("🔧 Cesium language object:", JSON.stringify({
+                  id: cesiumLang.id,
+                  scopeName: cesiumLang.scopeName,
+                  aliases: cesiumLang.aliases,
+                  hasGrammar: !!cesiumLang.grammar
+                }, null, 2))
+
                 const highlighter = await getHighlighter({
                   ...options,
                   langs: [
                     ...(options.langs || []),
-                    // Try direct grammar registration
-                    cesiumGrammar
+                    cesiumLang
                   ]
                 })
+
+                // Try to load the language explicitly
+                try {
+                  await highlighter.loadLanguage(cesiumGrammar)
+                  console.log("✅ Explicitly loaded cesium language")
+                } catch (loadError) {
+                  console.warn("⚠️  Failed to explicitly load cesium:", loadError)
+                }
 
                 console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
 
