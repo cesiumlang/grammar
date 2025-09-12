@@ -10,6 +10,7 @@
     { "include": "#keywords" },
     { "include": "#function-declarations" },
     { "include": "#struct-declarations" },
+    { "include": "#variable-declarations" },
     { "include": "#types" },
     { "include": "#strings" },
     { "include": "#numbers" },
@@ -114,6 +115,25 @@
             "1": { "name": "storage.type.cesium" },
             "2": { "name": "variable.other.property.cesium" },
             "3": { "name": "constant.other.cesium" }
+          }
+        }
+      ]
+    },
+    "variable-declarations": {
+      "patterns": [
+        {
+          "name": "meta.variable.declaration.cesium",
+          "match": "\\b([~#]?[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*[=,;])",
+          "captures": {
+            "1": { "name": "storage.type.cesium" },
+            "2": { "name": "variable.other.readwrite.cesium" }
+          }
+        },
+        {
+          "name": "meta.variable.assignment.cesium",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*=)",
+          "captures": {
+            "1": { "name": "variable.other.readwrite.cesium" }
           }
         }
       ]
@@ -245,10 +265,14 @@
       "patterns": [
         {
           "name": "support.function.builtin.cesium",
-          "match": "\\b(alloc|free|realloc|printf|debugf|assert|floor|ceil|trunc|round|trueround|abs|min|max|mean|norm)\\b"
+          "match": "\\b(alloc|free|realloc|printf|debugf|assert|floor|ceil|trunc|round|trueround|abs|min|max|mean|norm)(?=\\s*\\()"
         },
         {
-          "name": "entity.name.function.cesium",
+          "name": "support.function.method.cesium",
+          "match": "(?<=\\.)[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\()"
+        },
+        {
+          "name": "entity.name.function.call.cesium",
           "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\()"
         },
         {
@@ -261,11 +285,7 @@
         },
         {
           "name": "variable.other.property.cesium",
-          "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*(?=\\s*\\.[a-zA-Z_])"
-        },
-        {
-          "name": "variable.other.property.cesium",
-          "match": "(?<=\\.)[a-zA-Z_][a-zA-Z0-9_]*"
+          "match": "(?<=\\.)[a-zA-Z_][a-zA-Z0-9_]*(?!\\s*\\()"
         },
         {
           "name": "variable.other.readwrite.cesium",
