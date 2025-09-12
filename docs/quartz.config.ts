@@ -19,6 +19,7 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
             keepBackground: true,
             onVisitLine(node: any) {
               // Log when we're processing code lines
+              console.log("🔍 Processing line with className:", node.properties?.className)
               if (node.properties?.className?.includes('cesium')) {
                 console.log("🖍️  Processing Cesium code line")
               }
@@ -26,6 +27,11 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
             onVisitHighlightedLine(node: any) {
               if (node.properties?.className?.includes('cesium')) {
                 console.log("✨ Highlighted Cesium code line")
+              }
+            },
+            onVisitHighlightedChars(node: any) {
+              if (node.properties?.className?.includes('cesium')) {
+                console.log("🎨 Highlighted Cesium code chars")
               }
             },
             ...userOpts,
@@ -51,23 +57,34 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
                 console.log("📝 Grammar name:", cesiumGrammar.name)
                 console.log("🏷️  Grammar scopeName:", cesiumGrammar.scopeName)
 
-                // Ensure the grammar has the required properties for Shiki
-                const shikiGrammar = {
-                  id: "cesium",
-                  scopeName: cesiumGrammar.scopeName,
-                  grammar: cesiumGrammar,
-                  aliases: ["cesium"]
-                }
+                console.log("🔧 Raw grammar object keys:", Object.keys(cesiumGrammar))
 
                 const highlighter = await getHighlighter({
                   ...options,
                   langs: [
                     ...(options.langs || []),
-                    shikiGrammar
+                    // Try direct grammar registration
+                    cesiumGrammar
                   ]
                 })
 
                 console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
+
+                // Test if cesium language is actually available
+                try {
+                  const testCode = "const x: i32 = 42;"
+                  const highlighted = highlighter.codeToHtml(testCode, {
+                    lang: 'cesium',
+                    themes: {
+                      light: 'github-light',
+                      dark: 'github-dark'
+                    }
+                  })
+                  console.log("🧪 Test highlighting successful for cesium language")
+                } catch (testError) {
+                  console.warn("⚠️  Test highlighting failed:", testError)
+                }
+
                 return highlighter
               } catch (error) {
                 console.warn("❌ Failed to load Cesium grammar, using default languages:", error)
