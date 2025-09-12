@@ -1,6 +1,7 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
 import { QuartzTransformerPlugin } from "./quartz/plugins/types"
+import rehypePrettyCode from "rehype-pretty-code"
 
 // Custom Cesium Syntax Highlighting Plugin
 const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) => {
@@ -9,7 +10,7 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
     htmlPlugins() {
       return [
         [
-          require("rehype-pretty-code"),
+          rehypePrettyCode,
           {
             theme: {
               light: "github-light",
