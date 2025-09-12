@@ -14,9 +14,12 @@ Cesium supports three types of comments:
   Multi-line comment
 */
 
-/// Documentation comment for functions
-/// Multiple lines supported
-void = documented_function() {
+/**
+ * Documentation comment for functions
+ * @param x The input parameter
+ * @return The computed result
+ */
+i32 = documented_function(i32 x) {
     // implementation
 }
 ```

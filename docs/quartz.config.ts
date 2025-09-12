@@ -1,5 +1,55 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
+import { QuartzTransformerPlugin } from "./quartz/plugins/types"
+
+// Custom Cesium Syntax Highlighting Plugin
+const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) => {
+  return {
+    name: "CesiumSyntaxHighlighting",
+    htmlPlugins() {
+      return [
+        [
+          require("rehype-pretty-code"),
+          {
+            theme: {
+              light: "github-light",
+              dark: "github-dark",
+            },
+            keepBackground: true,
+            ...userOpts,
+            // Custom getHighlighter function for Cesium language support
+            getHighlighter: async (options: any) => {
+              const { getHighlighter } = await import("shiki")
+              const fs = await import("fs")
+              const path = await import("path")
+
+              // Path to the Cesium TextMate grammar file at workspace root.
+              // Don't forget this file in Git is only one level down from the
+              // repo root, but this file gets copied to quartz_repo during
+              // the build action, so the path needs an extra ../ here.
+              const grammarPath = path.resolve("../../cesium.tmGrammar.json")
+
+              try {
+                const cesiumGrammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
+
+                return await getHighlighter({
+                  ...options,
+                  langs: [
+                    ...(options.langs || []),
+                    cesiumGrammar
+                  ]
+                })
+              } catch (error) {
+                console.warn("Failed to load Cesium grammar, using default languages:", error)
+                return await getHighlighter(options)
+              }
+            },
+          }
+        ]
+      ]
+    },
+  }
+}
 
 /**
  * Quartz 4 Configuration
@@ -61,13 +111,8 @@ const config: QuartzConfig = {
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
       }),
-      Plugin.SyntaxHighlighting({
-        theme: {
-          light: "github-light",
-          dark: "github-dark",
-        },
-        keepBackground: false,
-      }),
+      // Use custom Cesium syntax highlighting instead of Plugin.SyntaxHighlighting
+      CesiumSyntaxHighlighting(),
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
       Plugin.TableOfContents({ maxDepth: 6 }),
