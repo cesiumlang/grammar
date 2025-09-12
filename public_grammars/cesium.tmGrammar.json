@@ -1,5 +1,5 @@
 {
-  "name": "Cesium",
+  "name": "cesium",
   "scopeName": "source.cesium",
   "fileTypes": ["cesium"],
   "uuid": "9ad5dda1-f2d3-478f-a8e2-5eef5b7bedf5",
