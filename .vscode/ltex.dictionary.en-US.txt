@@ -14,10 +14,13 @@ inlining
 Interop
 intrinsics
 katex
+lexer
 lightgray
 Monomorphization
 Namespacing
+RRGGBB
 Schibsted
+scrutinising
 shadowable
 shiki
 szenius
@@ -27,4 +30,3 @@ Variadic
 variadics
 vmovups
 Zig
-lexer

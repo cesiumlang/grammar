@@ -62,6 +62,10 @@
           "match": "\\b(file|str|list|dict|slice|path)\\b"
         },
         {
+          "name": "storage.type.user-defined.cesium",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        },
+        {
           "name": "storage.type.generic.cesium",
           "begin": "\\b(list|dict|slice)\\[",
           "end": "\\]",
@@ -149,6 +153,9 @@
           },
           "patterns": [
             {
+              "include": "#struct-methods"
+            },
+            {
               "include": "#struct-fields"
             },
             {
@@ -160,6 +167,24 @@
     },
     "struct-fields": {
       "patterns": [
+        {
+          "name": "meta.field.qualified.cesium",
+          "match": "\\b(private|secret|static|volatile|atomic)\\s+([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*=\\s*([^;]+))?;",
+          "captures": {
+            "1": {
+              "name": "keyword.storage.cesium"
+            },
+            "2": {
+              "name": "storage.type.cesium"
+            },
+            "3": {
+              "name": "variable.other.member.cesium"
+            },
+            "4": {
+              "name": "constant.other.cesium"
+            }
+          }
+        },
         {
           "name": "meta.field.cesium",
           "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*=\\s*([^;]+))?;",
@@ -174,6 +199,55 @@
               "name": "constant.other.cesium"
             }
           }
+        }
+      ]
+    },
+    "struct-methods": {
+      "patterns": [
+        {
+          "name": "meta.method.static.cesium",
+          "match": "\\b(static)\\s+([A-Z][a-zA-Z0-9_]*)\\s*=\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": {
+              "name": "keyword.storage.cesium"
+            },
+            "2": {
+              "name": "storage.type.return.cesium"
+            },
+            "3": {
+              "name": "entity.name.function.method.cesium"
+            }
+          }
+        },
+        {
+          "name": "meta.constructor.cesium",
+          "begin": "\\b([A-Z][a-zA-Z0-9_]*)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.function.constructor.cesium"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#function-parameters"
+            }
+          ]
+        },
+        {
+          "name": "meta.destructor.cesium",
+          "begin": "\\bdestruct\\s+([A-Z][a-zA-Z0-9_]*)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.function.destructor.cesium"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#function-parameters"
+            }
+          ]
         }
       ]
     },
