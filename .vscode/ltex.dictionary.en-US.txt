@@ -7,6 +7,7 @@ Deallocation
 EBNF
 Enums
 Fallthrough
+FETCHCONTENT
 filesystem
 frontmatter
 Grotesk
@@ -17,6 +18,7 @@ katex
 lexer
 lightgray
 Monomorphization
+MSVC
 Namespacing
 RRGGBB
 Schibsted

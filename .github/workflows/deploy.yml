@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/deploy.yml
+      - docs/**
+      - public_grammars/cesium.tmGrammar.json
 
 permissions:
   contents: read

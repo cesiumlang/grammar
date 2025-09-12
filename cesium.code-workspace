@@ -50,5 +50,18 @@
 			"streetsidesoftware.code-spell-checker-win32",
       "ltex-plus.vscode-ltex-plus",
     ]
-	}
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Launch",
+      "program": "${workspaceFolder}/build/bin/cesium.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+    ]
+  }
 }

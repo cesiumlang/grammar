@@ -8,13 +8,13 @@
       "include": "#comments"
     },
     {
+      "include": "#keywords"
+    },
+    {
       "include": "#function-declarations"
     },
     {
       "include": "#struct-declarations"
-    },
-    {
-      "include": "#keywords"
     },
     {
       "include": "#types"
@@ -146,10 +146,13 @@
       "patterns": [
         {
           "name": "meta.struct.cesium",
-          "begin": "\\bstruct\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\{",
+          "begin": "\\b(struct)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\{",
           "end": "\\}",
           "beginCaptures": {
             "1": {
+              "name": "keyword.other.cesium"
+            },
+            "2": {
               "name": "entity.name.type.struct.cesium"
             }
           },
