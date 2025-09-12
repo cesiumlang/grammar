@@ -19,6 +19,10 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               dark: "github-dark",
             },
             keepBackground: true,
+            defaultLang: {
+              block: "cesium",
+              inline: "cesium"
+            },
             onVisitHighlightedWord(node: any) {
               console.log("📝 Processing highlighted word:", node)
             },
@@ -61,31 +65,57 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               }
             },
             ...userOpts,
-            // Pre-register cesium language so it's available during markdown parsing
-            langs: [
-              'plaintext', // default
-              {
-                id: 'cesium',
-                scopeName: 'source.cesium',
-                grammar: (() => {
-                  try {
-                    // Path to the Cesium TextMate grammar file at workspace root.
-                    // Don't forget this file in Git is only one level down from the
-                    // repo root, but this file gets copied to quartz_repo during
-                    // the build action, so the path needs an extra ../ here.
-                    const grammarPath = path.resolve('../../cesium.tmGrammar.json')
-                    console.log("📁 Pre-loading grammar from:", grammarPath)
-                    const grammar = JSON.parse(fs.readFileSync(grammarPath, 'utf-8'))
-                    console.log("✅ Pre-loaded cesium grammar successfully!")
-                    return grammar
-                  } catch (error) {
-                    console.warn("❌ Failed to pre-load cesium grammar:", error)
-                    return null
-                  }
-                })(),
-                aliases: ['cesium']
+            // Custom getHighlighter function for Cesium language support
+            getHighlighter: async (options: any) => {
+              console.log("🔍 CesiumSyntaxHighlighting: getHighlighter called")
+              console.log("📋 Options received:", JSON.stringify(options, null, 2))
+
+              const { getSingletonHighlighter } = await import("shiki")
+
+              // Path to the Cesium TextMate grammar file at workspace root.
+              // Don't forget this file in Git is only one level down from the
+              // repo root, but this file gets copied to quartz_repo during
+              // the build action, so the path needs an extra ../ here.
+              const grammarPath = path.resolve("../../cesium.tmGrammar.json")
+              console.log("📁 Looking for grammar at:", grammarPath)
+
+              try {
+                const cesiumGrammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
+                console.log("✅ Cesium grammar loaded successfully!")
+                console.log("📝 Grammar name:", cesiumGrammar.name)
+                console.log("🏷️  Grammar scopeName:", cesiumGrammar.scopeName)
+
+                const highlighter = await getSingletonHighlighter({
+                  ...options,
+                  langs: [
+                    ...(options.langs || []),
+                    cesiumGrammar  // Use the grammar directly as rehype-pretty-code expects
+                  ]
+                })
+
+                console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
+
+                // Test if cesium language is actually available
+                try {
+                  const testCode = "const x: i32 = 42;"
+                  const highlighted = highlighter.codeToHtml(testCode, {
+                    lang: 'cesium',
+                    themes: {
+                      light: 'github-light',
+                      dark: 'github-dark'
+                    }
+                  })
+                  console.log("🧪 Test highlighting successful for cesium language")
+                } catch (testError) {
+                  console.warn("⚠️  Test highlighting failed:", testError)
+                }
+
+                return highlighter
+              } catch (error) {
+                console.warn("❌ Failed to load Cesium grammar, using default languages:", error)
+                return await getSingletonHighlighter(options)
               }
-            ].filter(lang => typeof lang === 'string' || (lang && lang.grammar)),
+            },
           }
         ]
       ]

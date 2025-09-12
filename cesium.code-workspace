@@ -8,7 +8,7 @@
     "files.exclude": {
       "_site/**": true,
       "docs/quartz_repo/.github/workflows/**": true,
-      "**/node_modules/**": true,
+      // "**/node_modules/**": true,
       "docs/quartz/**": true
     },
 		"editor.wrappingIndent": "indent",
