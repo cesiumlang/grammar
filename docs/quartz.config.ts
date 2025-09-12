@@ -9,6 +9,23 @@ import * as path from "path"
 const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) => {
   return {
     name: "CesiumSyntaxHighlighting",
+    markdownPlugins() {
+      // Add a markdown plugin to debug what's happening BEFORE HTML conversion
+      return [
+        () => {
+          return (tree: any) => {
+            console.log("🔍 Markdown AST before HTML conversion:")
+            const visit = require('unist-util-visit')
+            visit(tree, 'code', (node: any) => {
+              console.log("📝 Found markdown code block:")
+              console.log("  - lang:", node.lang)
+              console.log("  - meta:", node.meta)
+              console.log("  - value preview:", node.value?.substring(0, 50))
+            })
+          }
+        }
+      ]
+    },
     htmlPlugins() {
       return [
         [
@@ -26,13 +43,17 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
             transformers: [{
               name: 'cesium-block-detector',
               code(node: any) {
-                console.log("🎯 Code block detected:")
+                console.log("🎯 HTML Code block detected:")
                 console.log("  - tagName:", node.tagName)
-                console.log("  - properties:", node.properties)
-                console.log("  - data attributes:", Object.keys(node.properties || {}).filter(k => k.startsWith('data')))
+                console.log("  - properties:", JSON.stringify(node.properties, null, 2))
+                console.log("  - children count:", node.children?.length)
+                if (node.children?.[0]) {
+                  console.log("  - first child:", JSON.stringify(node.children[0], null, 2))
+                }
 
                 if (node.properties?.['data-language'] === 'cesium' ||
-                    node.properties?.className?.includes('cesium')) {
+                    node.properties?.className?.includes('cesium') ||
+                    node.properties?.className?.includes('language-cesium')) {
                   console.log("🎉 CESIUM CODE BLOCK FOUND!")
                 }
               }
