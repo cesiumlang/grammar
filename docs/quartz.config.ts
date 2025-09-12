@@ -19,10 +19,7 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               dark: "github-dark",
             },
             keepBackground: true,
-            defaultLang: {
-              block: "cesium",
-              inline: "cesium"
-            },
+            defaultLang: "cesium", // Simplified - both block and inline default to cesium
             onVisitHighlightedWord(node: any) {
               console.log("📝 Processing highlighted word:", node)
             },
@@ -164,10 +161,10 @@ const config: QuartzConfig = {
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
       }),
-      // Use custom Cesium syntax highlighting instead of Plugin.SyntaxHighlighting
-      CesiumSyntaxHighlighting(),
       Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
       Plugin.GitHubFlavoredMarkdown(),
+      // Use custom Cesium syntax highlighting AFTER markdown processing
+      CesiumSyntaxHighlighting(),
       Plugin.TableOfContents({ maxDepth: 6 }),
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
       Plugin.Description(),
