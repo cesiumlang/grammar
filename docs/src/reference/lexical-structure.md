@@ -1,6 +1,6 @@
 ---
 title: "Lexical Structure"
-tags: ["cesium", "lexical", "comments", "keywords", "identifiers", "strings"]
+tags: ["lexical", "comments", "keywords", "identifiers", "strings"]
 ---
 
 ## Comments

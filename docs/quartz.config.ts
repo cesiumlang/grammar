@@ -17,9 +17,23 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               dark: "github-dark",
             },
             keepBackground: true,
+            onVisitLine(node: any) {
+              // Log when we're processing code lines
+              if (node.properties?.className?.includes('cesium')) {
+                console.log("🖍️  Processing Cesium code line")
+              }
+            },
+            onVisitHighlightedLine(node: any) {
+              if (node.properties?.className?.includes('cesium')) {
+                console.log("✨ Highlighted Cesium code line")
+              }
+            },
             ...userOpts,
             // Custom getHighlighter function for Cesium language support
             getHighlighter: async (options: any) => {
+              console.log("🔍 CesiumSyntaxHighlighting: getHighlighter called")
+              console.log("📋 Options received:", JSON.stringify(options, null, 2))
+
               const { getHighlighter } = await import("shiki")
               const fs = await import("fs")
               const path = await import("path")
@@ -29,19 +43,34 @@ const CesiumSyntaxHighlighting: QuartzTransformerPlugin<any> = (userOpts = {}) =
               // repo root, but this file gets copied to quartz_repo during
               // the build action, so the path needs an extra ../ here.
               const grammarPath = path.resolve("../../cesium.tmGrammar.json")
+              console.log("📁 Looking for grammar at:", grammarPath)
 
               try {
                 const cesiumGrammar = JSON.parse(fs.readFileSync(grammarPath, "utf-8"))
+                console.log("✅ Cesium grammar loaded successfully!")
+                console.log("📝 Grammar name:", cesiumGrammar.name)
+                console.log("🏷️  Grammar scopeName:", cesiumGrammar.scopeName)
 
-                return await getHighlighter({
+                // Ensure the grammar has the required properties for Shiki
+                const shikiGrammar = {
+                  id: "cesium",
+                  scopeName: cesiumGrammar.scopeName,
+                  grammar: cesiumGrammar,
+                  aliases: ["cesium"]
+                }
+
+                const highlighter = await getHighlighter({
                   ...options,
                   langs: [
                     ...(options.langs || []),
-                    cesiumGrammar
+                    shikiGrammar
                   ]
                 })
+
+                console.log("🎨 Highlighter created with languages:", highlighter.getLoadedLanguages())
+                return highlighter
               } catch (error) {
-                console.warn("Failed to load Cesium grammar, using default languages:", error)
+                console.warn("❌ Failed to load Cesium grammar, using default languages:", error)
                 return await getHighlighter(options)
               }
             },

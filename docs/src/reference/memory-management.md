@@ -1,6 +1,6 @@
 ---
 title: "Memory Management"
-tags: ["cesium", "memory", "ownership", "allocation", "defer"]
+tags: ["memory", "ownership", "allocation", "defer"]
 ---
 
 ## Basic Memory Operations

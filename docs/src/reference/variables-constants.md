@@ -1,6 +1,6 @@
 ---
 title: "Variables and Constants"
-tags: ["cesium", "variables", "constants", "qualifiers", "ownership"]
+tags: ["variables", "constants", "qualifiers", "ownership"]
 ---
 
 ## Variable Declaration

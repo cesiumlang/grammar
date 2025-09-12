@@ -1,6 +1,6 @@
 ---
 title: "Modules and Imports"
-tags: ["cesium", "modules", "imports", "namespaces", "extern"]
+tags: ["modules", "imports", "namespaces", "extern"]
 ---
 
 ## Module Structure

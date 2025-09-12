@@ -1,6 +1,6 @@
 ---
 title: "Error Handling"
-tags: ["cesium", "errors", "exceptions", "error-types", "catch"]
+tags: ["errors", "exceptions", "error-types", "catch"]
 ---
 
 ## Error Type Definition

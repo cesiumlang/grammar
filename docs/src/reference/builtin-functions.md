@@ -1,6 +1,6 @@
 ---
 title: "Built-in Functions"
-tags: ["cesium", "builtin", "functions", "io", "math", "introspection"]
+tags: ["builtin", "functions", "io", "math", "introspection"]
 ---
 
 ## I/O Functions

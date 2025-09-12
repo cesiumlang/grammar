@@ -1,6 +1,6 @@
 ---
 title: "Control Flow"
-tags: ["cesium", "control-flow", "conditionals", "loops", "pattern-matching"]
+tags: ["control-flow", "conditionals", "loops", "pattern-matching"]
 ---
 
 ## Conditional Statements

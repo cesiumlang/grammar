@@ -1,6 +1,6 @@
 ---
 title: "Functions"
-tags: ["cesium", "functions", "generics", "overloading", "variadics"]
+tags: ["functions", "generics", "overloading", "variadics"]
 ---
 
 ## Function Declaration

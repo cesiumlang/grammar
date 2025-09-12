@@ -1,6 +1,6 @@
 ---
 title: "Type System"
-tags: ["cesium", "types", "primitives", "arrays", "pointers", "simd"]
+tags: ["types", "primitives", "arrays", "pointers", "simd"]
 ---
 
 ## Primitive Types

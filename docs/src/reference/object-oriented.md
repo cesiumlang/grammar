@@ -1,6 +1,6 @@
 ---
 title: "Object-Oriented Programming"
-tags: ["cesium", "oop", "structs", "inheritance", "traits", "properties"]
+tags: ["oop", "structs", "inheritance", "traits", "properties"]
 ---
 
 ## Struct Definition and Usage

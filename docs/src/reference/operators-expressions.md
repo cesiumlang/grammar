@@ -1,6 +1,6 @@
 ---
 title: "Operators and Expressions"
-tags: ["cesium", "operators", "expressions", "precedence", "arithmetic"]
+tags: ["operators", "expressions", "precedence", "arithmetic"]
 ---
 
 ## Operator Precedence (highest to lowest)
