@@ -1,0 +1,16 @@
+{
+  "name": "cesium-grammar",
+  "version": "1.0.0",
+  "description": "A collection of Cesium grammar files and other resources for syntax highlighters",
+  "main": "index.js",
+  "scripts": {
+    "test": "vscode-tmgrammar-test -g cesium.tmGrammar.json tests/*.cs",
+    "test:snap": "vscode-tmgrammar-snap -g cesium.tmGrammar.json tests/*.cs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vscode-tmgrammar-test": "^0.1.3"
+  }
+}
