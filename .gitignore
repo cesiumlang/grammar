@@ -1,34 +1,3 @@
-# Node.js dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Package lock files
-package-lock.json
-yarn.lock
-
-# Test output and coverage
-coverage/
-.nyc_output/
-test-results/
-*.test.js
-*.spec.js
-
-# IDE files
-# .vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
 .cache/
-
 *.snap
