@@ -4,13 +4,25 @@
   "description": "A collection of Cesium grammar files and other resources for syntax highlighters",
   "main": "index.js",
   "scripts": {
-    "test": "vscode-tmgrammar-test -g cesium.tmGrammar.json tests/*.cs",
-    "test:snap": "vscode-tmgrammar-snap -g cesium.tmGrammar.json tests/*.cs"
+    "test": "vscode-tmgrammar-test -g cesium.tmGrammar.json tests/*.cs tests/*.czm",
+    "test:snap": "vscode-tmgrammar-snap -g cesium.tmGrammar.json tests/*.cs tests/*.czm"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Randy Eckman",
+  "license": "MIT",
   "devDependencies": {
     "vscode-tmgrammar-test": "^0.1.3"
+  },
+  "contributes": {
+    "languages": [{
+      "id": "cesium",
+      "extensions": [".cs", ".czm"],
+      "aliases": ["Cesium", "cesium"]
+    }],
+    "grammars": [{
+      "language": "cesium",
+      "scopeName": "source.cesium",
+      "path": "./cesium.tmGrammar.json"
+    }]
   }
 }

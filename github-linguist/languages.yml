@@ -40,6 +40,7 @@ Cesium:
   color: "#ff6644"
   extensions:
   - ".cs"
+  - ".czm"
   tm_scope: source.cesium
   ace_mode: text
   # ace_mode: cesium

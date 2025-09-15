@@ -1,0 +1,15 @@
+// SYNTAX TEST "source.cesium" "Test .czm file extension"
+
+// Test that .czm files work the same as .cs files
+variable_name
+// <- variable.other.cesium
+
+MAX_SIZE
+// <- variable.other.constant.cesium
+
+Class2D
+// <- entity.name.type.cesium
+
+printf("Hello from .czm!");
+//^^^^ support.function.builtin.cesium
+//     ^^^^^^^^^^^^^^^ string.quoted.double.cesium

@@ -5,11 +5,14 @@
 		}
 	],
 	"settings": {
+    "files.associations": {
+      "*.cs": "cesium",
+      "*.czm": "cesium"
+    },
     "files.exclude": {
       "**/node_modules/**": true,
     },
 		"editor.wrappingIndent": "indent",
-    // "markdown.styles": ["custom-tag-style.css"]
 		"[markdown]": {
       "editor.quickSuggestions": {
         "other": true,
