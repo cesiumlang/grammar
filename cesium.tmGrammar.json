@@ -8,8 +8,10 @@
   "uuid": "9ad5dda1-f2d3-478f-a8e2-5eef5b7bedf5",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#catch-blocks" },
     { "include": "#struct-declarations" },
     { "include": "#alias-declarations" },
+    { "include": "#union-declarations" },
     { "include": "#function-declarations" },
     { "include": "#keywords" },
     { "include": "#variable-declarations" },
@@ -26,6 +28,43 @@
         { "name": "storage.modifier.cesium", "match": "\\b(const|static|private|secret|volatile|atomic|register|simd|extern|export)\\b" },
         { "name": "keyword.other.cesium", "match": "\\b(alias|as|comptime|generic|sizeof|typeof|asm|enum|error|union|operator|context|property|destruct|trait|impl|type|namespace|std|struct)\\b" },
         { "name": "constant.language.cesium", "match": "\\b(true|false|null|pi|stdout|stdin|stderr)\\b" }
+      ]
+    },
+    "catch-blocks": {
+      "patterns": [
+        {
+          "name": "meta.catch.cesium",
+          "begin": "\\b(catch)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.cesium" }
+          },
+          "patterns": [
+            { "include": "#identifiers" }
+          ]
+        },
+        {
+          "name": "meta.case.error.cesium",
+          "begin": "\\b(case)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.cesium" }
+          },
+          "patterns": [
+            {
+              "name": "invalid.errorstruct.builtin.cesium",
+              "match": "\\b(FileNotFound|AccessDenied|NetworkTimeout|NoImpl|PermissionDenied|InvalidArgument|OutOfMemory|Timeout|NotImplemented)\\b"
+            },
+            {
+              "name": "invalid.errorstruct.cesium",
+              "match": "\\b[A-Z][a-zA-Z0-9_]*(?:Error|Failure|Exception|NotFound|Denied|Timeout)?\\b"
+            },
+            {
+              "name": "keyword.operator.bitwise.cesium",
+              "match": "\\|"
+            }
+          ]
+        }
       ]
     },
     "alias-declarations": {
@@ -59,10 +98,42 @@
         }
       ]
     },
+    "union-declarations": {
+      "patterns": [
+        {
+          "name": "meta.union.error.cesium",
+          "match": "\\b(union)\\s+([A-Z][a-zA-Z0-9_]*Error)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.other.cesium" },
+            "2": { "name": "invalid.errorstruct.cesium" },
+            "3": { "name": "keyword.operator.assignment.cesium" }
+          }
+        },
+        {
+          "name": "meta.union.error.union.cesium",
+          "match": "\\b(union)\\s+([A-Z][a-zA-Z0-9_]*(?:Error|Failure|Exception))\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.other.cesium" },
+            "2": { "name": "invalid.errorstruct.cesium" },
+            "3": { "name": "keyword.operator.assignment.cesium" }
+          }
+        },
+        {
+          "name": "meta.union.cesium",
+          "match": "\\b(union)\\s+([A-Z][a-zA-Z0-9_]*)\\s*(=)",
+          "captures": {
+            "1": { "name": "keyword.other.cesium" },
+            "2": { "name": "entity.name.type.cesium" },
+            "3": { "name": "keyword.operator.assignment.cesium" }
+          }
+        }
+      ]
+    },
     "types": {
       "patterns": [
         { "name": "storage.type.primitive.cesium", "match": "\\b(u\\d+|i\\d+|f16|f32|f64|f128|uword|void)\\b" },
         { "name": "storage.type.builtin.cesium", "match": "\\b(file|str|list|dict|slice|path)\\b" },
+        { "name": "invalid.errorstruct.builtin.cesium", "match": "\\b(FileNotFound|AccessDenied|NetworkTimeout|NoImpl|PermissionDenied|InvalidArgument|OutOfMemory|Timeout|NotImplemented)\\b" },
         { "name": "invalid.errorstruct.cesium", "match": "\\b[A-Z](?=.*[a-z])[a-zA-Z0-9_]*Error\\b" },
         { "name": "entity.name.type.cesium", "match": "\\b[A-Z](?=.*[a-z])[a-zA-Z0-9_]*\\b" },
         {
@@ -113,6 +184,14 @@
     },
     "function-parameters": {
       "patterns": [
+        {
+          "name": "meta.parameter.standard.error.cesium",
+          "match": "\\b([~#]?(FileNotFound|AccessDenied|NetworkTimeout|NoImpl|PermissionDenied|InvalidArgument|OutOfMemory|Timeout|NotImplemented)(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "captures": {
+            "1": { "name": "invalid.errorstruct.builtin.cesium" },
+            "2": { "name": "variable.parameter.cesium" }
+          }
+        },
         {
           "name": "meta.parameter.error.cesium",
           "match": "\\b([~#]?[A-Z](?=.*[a-z])[a-zA-Z0-9_]*Error(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
@@ -197,8 +276,16 @@
     "variable-declarations": {
       "patterns": [
         {
+          "name": "meta.variable.declaration.standard.error.cesium",
+          "match": "\\b([~#]?(FileNotFound|AccessDenied|NetworkTimeout|NoImpl|PermissionDenied|InvalidArgument|OutOfMemory|Timeout|NotImplemented)(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*[=,;])",
+          "captures": {
+            "1": { "name": "invalid.errorstruct.builtin.cesium" },
+            "2": { "name": "variable.other.cesium" }
+          }
+        },
+        {
           "name": "meta.variable.declaration.error.cesium",
-          "match": "\\b([~#]?[A-Z](?=.*[a-z])[a-zA-Z0-9_]*Error(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*[=,;])",
+          "match": "\\b([~#]?[A-Z](?=.*[a-z])[a-zA-Z0-9_]*(?:Error|Failure|Exception)(?:\\[[^\\]]*\\])?)\\s+([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*[=,;])",
           "captures": {
             "1": { "name": "invalid.errorstruct.cesium" },
             "2": { "name": "variable.other.cesium" }
@@ -379,6 +466,10 @@
         {
           "name": "variable.other.constant.cesium",
           "match": "\\b[A-Z][A-Z0-9_]*\\b"
+        },
+        {
+          "name": "invalid.errorstruct.builtin.cesium",
+          "match": "\\b(FileNotFound|AccessDenied|NetworkTimeout|NoImpl|PermissionDenied|InvalidArgument|OutOfMemory|Timeout|NotImplemented)\\b"
         },
         {
           "name": "invalid.errorstruct.cesium",

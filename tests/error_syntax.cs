@@ -22,19 +22,39 @@ error NetworkTimeout {
 // Test error type aliases
 alias FileError = FileNotFound|AccessDenied;
 //    ^^^^^^^^^ invalid.errorstruct.cesium
-//                ^^^^^^^^^^^^ entity.name.type.cesium
+//                ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
 //                            ^ keyword.operator.bitwise.cesium
-//                             ^^^^^^^^^^^^ entity.name.type.cesium
+//                             ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
 
 alias IOError = FileError|NetworkTimeout;
 //    ^^^^^^^ invalid.errorstruct.cesium
 //              ^^^^^^^^^ invalid.errorstruct.cesium
 //                       ^ keyword.operator.bitwise.cesium
-//                        ^^^^^^^^^^^^^^ entity.name.type.cesium
+//                        ^^^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
 
 alias SystemFailure = FileError;
 //    ^^^^^^^^^^^^^ invalid.errorstruct.cesium
 //                    ^^^^^^^^^ invalid.errorstruct.cesium
+
+// Test union declarations (new syntax)
+union FileError = FileNotFound|AccessDenied;
+//    ^^^^^^^^^ invalid.errorstruct.cesium
+//                ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+//                            ^ keyword.operator.bitwise.cesium
+//                             ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+
+union IOError = FileError|NetworkTimeout;
+//    ^^^^^^^ invalid.errorstruct.cesium
+//              ^^^^^^^^^ invalid.errorstruct.cesium
+//                       ^ keyword.operator.bitwise.cesium
+//                        ^^^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+
+// Test non-error unions
+union Number = i32|f64|u64;
+//    ^^^^^^ entity.name.type.cesium
+
+union Shape = Circle|Rectangle|Triangle;
+//    ^^^^^ entity.name.type.cesium
 
 // Test function with error return types
 FileError|file = open_file(str path) {
@@ -46,7 +66,7 @@ FileError|file = open_file(str path) {
     if (!file_exists(path)) {
 //       ^^^^^^^^^^^ entity.name.function.call.cesium
         return FileNotFound { path = path, errno = 2 };
-//             ^^^^^^^^^^^^ entity.name.type.cesium
+//             ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
     }
     return FileFound { path = path };
 //         ^^^^^^^^^ entity.name.type.cesium
@@ -72,3 +92,30 @@ ParseError parseErr = createParseError();
 //         ^^^^^^^^ variable.other.cesium
 //                  ^ keyword.operator.assignment.cesium
 //                    ^^^^^^^^^^^^^^^^ entity.name.function.call.cesium
+
+// Test catch blocks with error type pattern matching
+file_or_error catch (err) {
+//            ^^^^^ keyword.control.cesium
+    case (FileNotFound) {
+//  ^^^^ keyword.control.cesium
+//        ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+        printf("File not found\n");
+    }
+    case (AccessDenied) {
+//  ^^^^ keyword.control.cesium
+//        ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+        printf("Access denied\n");
+    }
+    case (FileNotFound|AccessDenied) {
+//  ^^^^ keyword.control.cesium
+//        ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+//                    ^ keyword.operator.bitwise.cesium
+//                     ^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+        printf("File access error\n");
+    }
+    case (NetworkTimeout) {
+//  ^^^^ keyword.control.cesium
+//        ^^^^^^^^^^^^^^ invalid.errorstruct.builtin.cesium
+        printf("Network timeout\n");
+    }
+}
