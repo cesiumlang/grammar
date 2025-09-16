@@ -9,6 +9,10 @@
       "*.cs": "cesium",
       "*.czm": "cesium"
     },
+    "files.watcherExclude": {
+      "**/node_modules/**": true,
+      "**/.cache/**": true,
+		},
     "files.exclude": {
       "**/node_modules/**": true,
     },
