@@ -73,11 +73,12 @@ FileError|file = open_file(str path) {
 }
 
 // Test regular function for comparison (should NOT be error types)
-MyData result = process_data(str input) {
+MyData = process_data(str input) {
 //^^^^ entity.name.type.cesium
-//     ^^^^^^ variable.other.cesium
-//            ^ keyword.operator.assignment.cesium
-//              ^^^^^^^^^^^^ entity.name.function.call.cesium
+//     ^ keyword.operator.assignment.cesium
+//       ^^^^^^^^^^^^ entity.name.function.cesium
+//                    ^^^ storage.type.cesium
+//                        ^^^^^ variable.parameter.cesium
     return MyData { value = input };
 //         ^^^^^^ entity.name.type.cesium
 }
