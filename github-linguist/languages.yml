@@ -39,8 +39,8 @@ Cesium:
   type: programming
   color: "#ff6644"
   extensions:
-  - ".cs"
-  - ".czm"
+  - ".csm"
+  - ".csi"
   tm_scope: source.cesium
   ace_mode: text
   # ace_mode: cesium

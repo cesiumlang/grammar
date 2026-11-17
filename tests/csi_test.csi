@@ -1,6 +1,6 @@
-// SYNTAX TEST "source.cesium" "Test .czm file extension"
+// SYNTAX TEST "source.cesium" "Test .csi file extension"
 
-// Test that .czm files work the same as .cs files
+// Test that .csi module interface files use the same grammar as .csm source files
 variable_name
 // <- variable.other.cesium
 
@@ -10,6 +10,6 @@ MAX_SIZE
 Class2D
 // <- entity.name.type.cesium
 
-printf("Hello from .czm!");
+printf("Hello from .csi!");
 //^^^^ support.function.builtin.cesium
 //     ^^^^^^^^^^^^^^^ string.quoted.double.cesium

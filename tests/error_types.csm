@@ -1,0 +1,40 @@
+// SYNTAX TEST "source.cesium" "Error Type Tests"
+
+// Test error struct types in various contexts
+FileNotFoundError myError;
+//^^^^^^^^^^^^^^^ invalid.errorstruct.cesium
+//                ^^^^^^^ variable.other.cesium
+NetworkTimeoutError timeout;
+//^^^^^^^^^^^^^^^^^ invalid.errorstruct.cesium
+//                  ^^^^^^^ variable.other.cesium
+MyClass normalType;
+//^^^^^ entity.name.type.cesium
+//      ^^^^^^^^^^ variable.other.cesium
+PersonData userData;
+//^^^^^^^^ entity.name.type.cesium
+//         ^^^^^^^^ variable.other.cesium
+
+void = handleError(FileSystemError fsErr) {
+//   ^ keyword.operator.assignment.cesium
+//     ^^^^^^^^^^^ entity.name.function.cesium
+//                 ^^^^^^^^^^^^^^^ invalid.errorstruct.cesium
+//                                 ^^^^^ variable.parameter.cesium
+    return;
+//  ^^^^^^ keyword.control.cesium
+}
+
+switch (typeof(result)) {
+//^^^^ keyword.control.cesium
+//      ^^^^^^ keyword.other.cesium
+    case (FileAccessError) {
+//  ^^^^ keyword.control.cesium
+//        ^^^^^^^^^^^^^^^ invalid.errorstruct.cesium
+        // handle error
+    }
+}
+
+ParseError err = createParseError();
+//^^^^^^^^ invalid.errorstruct.cesium
+//         ^^^ variable.other.cesium
+//             ^ keyword.operator.assignment.cesium
+//               ^^^^^^^^^^^^^^^^ entity.name.function.call.cesium

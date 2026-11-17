@@ -1,0 +1,81 @@
+// SYNTAX TEST "source.cesium" "Ownership and Borrowing Tests"
+
+// Owned return value, owning pointer, undefined
+:~Matrix = create_matrix(i32 rows, i32 cols) {
+// <- keyword.operator.pointer.owned.cesium
+//^^^^^^ entity.name.type.cesium
+//       ^ keyword.operator.assignment.cesium
+//         ^^^^^^^^^^^^^ entity.name.function.cesium
+  ~Matrix m := alloc(1);
+//^ keyword.operator.pointer.cesium
+// ^^^^^^ entity.name.type.cesium
+//          ^^ keyword.operator.assignment.cesium
+//             ^^^^^ support.function.builtin.cesium
+  ~Buffer buf = undefined;
+//              ^^^^^^^^^ constant.language.cesium
+  return m;
+}
+
+// Owned parameter
+void = consume(:#Matrix m) { free(m); }
+//             ^ keyword.operator.pointer.owned.cesium
+//              ^ keyword.operator.pointer.cesium
+//               ^^^^^^ entity.name.type.cesium
+//                      ^ variable.parameter.cesium
+
+// Borrowed parameters
+f64 = determinant(#Matrix m, ~Matrix scratch) {
+//                ^ keyword.operator.pointer.cesium
+//                 ^^^^^^ entity.name.type.cesium
+//                           ^ keyword.operator.pointer.cesium
+//                                   ^^^^^^^ variable.parameter.cesium
+}
+
+void = borrows() {
+  #Matrix a #= q;
+//^ keyword.operator.pointer.cesium
+//          ^^ keyword.operator.assignment.cesium
+  ~Matrix b ~= q;
+//^ keyword.operator.pointer.cesium
+//          ^^ keyword.operator.assignment.cesium
+  f64 d = determinant(#v, ~w);
+//                    ^ keyword.operator.pointer.cesium
+//                        ^ keyword.operator.pointer.cesium
+
+  // Decorated (address arithmetic) operators
+  a #= a #+ 1;
+//       ^^ keyword.operator.pointer.arithmetic.cesium
+  b ~= b ~+ 1;
+//       ^^ keyword.operator.pointer.arithmetic.cesium
+  b ~= b ~- 1;
+//       ^^ keyword.operator.pointer.arithmetic.cesium
+  a#++;
+// ^^^ keyword.operator.pointer.arithmetic.cesium
+  b~--;
+// ^^^ keyword.operator.pointer.arithmetic.cesium
+  #i32 p #= addrcontext(q);
+//          ^^^^^^^^^^^ support.function.builtin.cesium
+}
+
+// Owning struct fields and read-only methods
+struct Circle {
+  f64 r;
+  :~Buffer data;
+//^ keyword.operator.pointer.owned.cesium
+// ^ keyword.operator.pointer.cesium
+//  ^^^^^^ storage.type.cesium
+//         ^^^^ variable.other.member.cesium
+  f64 = #area() {
+//^^^ entity.name.type.cesium
+//    ^ keyword.operator.assignment.cesium
+//      ^ storage.modifier.readonly.cesium
+//       ^^^^ entity.name.function.cesium
+    return pi * r^2;
+  }
+}
+
+// Read-only method outside a struct body
+f64 = #distance_from_origin() {
+//    ^ storage.modifier.readonly.cesium
+//     ^^^^^^^^^^^^^^^^^^^^ entity.name.function.cesium
+}
