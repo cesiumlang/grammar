@@ -26,8 +26,8 @@
       "patterns": [
         { "name": "keyword.control.cesium", "match": "\\b(if|else|while|for|do|with|defer|break|continue|switch|case|fallthrough|return|throw|catch)\\b" },
         { "name": "storage.modifier.cesium", "match": "\\b(const|static|private|secret|volatile|atomic|register|simd|extern|export)\\b" },
-        { "name": "keyword.other.cesium", "match": "\\b(alias|as|comptime|generic|sizeof|typeof|asm|enum|error|union|operator|context|property|destruct|trait|impl|type|namespace|std|struct)\\b" },
-        { "name": "constant.language.cesium", "match": "\\b(true|false|null|pi|stdout|stdin|stderr)\\b" }
+        { "name": "keyword.other.cesium", "match": "\\b(alias|as|comptime|generic|sizeof|typeof|asm|enum|error|union|operator|context|property|destruct|trait|impl|type|namespace|std|struct|import)\\b" },
+        { "name": "constant.language.cesium", "match": "\\b(true|false|null|undefined|pi|stdout|stdin|stderr)\\b" }
       ]
     },
     "catch-blocks": {
@@ -148,35 +148,38 @@
       "patterns": [
         {
           "name": "meta.function.error.cesium",
-          "begin": "\\b([A-Z](?=.*[a-z])[a-zA-Z0-9_]*(?:Error|Failure|Exception)(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "begin": "\\b([A-Z](?=.*[a-z])[a-zA-Z0-9_]*(?:Error|Failure|Exception)(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*(#)?([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
           "end": "\\)",
           "beginCaptures": {
             "1": { "name": "invalid.errorstruct.cesium" },
             "2": { "name": "keyword.operator.assignment.cesium" },
-            "3": { "name": "entity.name.function.cesium" }
+            "3": { "name": "storage.modifier.readonly.cesium" },
+            "4": { "name": "entity.name.function.cesium" }
           },
           "patterns": [ { "include": "#function-parameters" } ]
         },
         {
           "name": "meta.function.cesium",
-          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "begin": "\\b([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*(#)?([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
           "end": "\\)",
           "beginCaptures": {
             "1": { "name": "entity.name.type.cesium" },
             "2": { "name": "keyword.operator.assignment.cesium" },
-            "3": { "name": "entity.name.function.cesium" }
+            "3": { "name": "storage.modifier.readonly.cesium" },
+            "4": { "name": "entity.name.function.cesium" }
           },
           "patterns": [ { "include": "#function-parameters" } ]
         },
         {
           "name": "meta.function.generic.cesium",
-          "begin": "\\bgeneric<([^>]+)>\\s*([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "begin": "\\bgeneric<([^>]+)>\\s*([a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?(?:,\\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\\[[^\\]]*\\])?)*)\\s*(=)\\s*(#)?([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
           "end": "\\)",
           "beginCaptures": {
             "1": { "name": "storage.type.generic.parameter.cesium" },
             "2": { "name": "entity.name.type.cesium" },
             "3": { "name": "keyword.operator.assignment.cesium" },
-            "4": { "name": "entity.name.function.cesium" }
+            "4": { "name": "storage.modifier.readonly.cesium" },
+            "5": { "name": "entity.name.function.cesium" }
           },
           "patterns": [ { "include": "#function-parameters" } ]
         }
@@ -215,7 +218,14 @@
             "1": { "name": "storage.type.cesium" },
             "2": { "name": "variable.parameter.cesium" }
           }
-        }
+        },
+        { "include": "#pointer-sigils" }
+      ]
+    },
+    "pointer-sigils": {
+      "patterns": [
+        { "name": "keyword.operator.pointer.owned.cesium", "match": ":(?=[#~])" },
+        { "name": "keyword.operator.pointer.cesium", "match": "~|#" }
       ]
     },
     "struct-declarations": {
@@ -230,7 +240,9 @@
           },
           "patterns": [
             { "include": "#struct-methods" },
+            { "include": "#function-declarations" },
             { "include": "#struct-fields" },
+            { "include": "#pointer-sigils" },
             { "include": "#comments" }
           ]
         },
@@ -244,7 +256,9 @@
           },
           "patterns": [
             { "include": "#struct-methods" },
+            { "include": "#function-declarations" },
             { "include": "#struct-fields" },
+            { "include": "#pointer-sigils" },
             { "include": "#comments" }
           ]
         }
@@ -430,16 +444,19 @@
     },
     "operators": {
       "patterns": [
-        { "name": "keyword.operator.assignment.cesium", "match": "#=|:=" },
+        { "name": "keyword.operator.assignment.cesium", "match": "#=|~=|:=" },
+        { "name": "keyword.operator.pointer.owned.cesium", "match": ":(?=[#~])" },
+        { "name": "keyword.operator.pointer.arithmetic.cesium", "match": "[#~](?:\\+\\+|\\-\\-|\\+|\\-)" },
         { "name": "keyword.operator.range.step.cesium", "match": "\\.\\.(?=\\d+\\.\\.=?)" },
         { "name": "keyword.operator.unary.cesium", "match": "(?<!\\w)\\.\\.(?!\\w|=)|(?<=\\w)\\.\\.(?!\\w|=)" },
         { "name": "keyword.operator.range.cesium", "match": "\\.\\.=?" },
+        { "name": "keyword.operator.assignment.compound.cesium", "match": "\\*\\*=|\\+=|\\-=|\\*=|\\/=|%=|\\^=|&=|\\|=|><=|<<=|>>=" },
         { "name": "keyword.operator.comparison.cesium", "match": "==|!=|<=|>=|<|>" },
         { "name": "keyword.operator.logical.cesium", "match": "&&|\\|\\||!" },
         { "name": "keyword.operator.bitwise.cesium", "match": "&|\\||><|<<|>>" },
         { "name": "keyword.operator.string.cesium", "match": "\\*\\*" },
         { "name": "keyword.operator.arithmetic.cesium", "match": "\\+\\+|\\-\\-|\\+|\\-|::|@|\\*|\\/|%|\\^" },
-        { "name": "keyword.operator.assignment.cesium", "match": "\\*\\*=|\\+=|\\-=|\\*=|\\/=|%=|&=|\\|=|><=|<<=|>>=|=" },
+        { "name": "keyword.operator.assignment.cesium", "match": "=" },
         { "name": "keyword.operator.custom.cesium", "match": "\\$[a-zA-Z_][a-zA-Z0-9_]*\\$" },
         { "name": "keyword.operator.pointer.cesium", "match": "~|#" }
       ]
@@ -448,7 +465,7 @@
       "patterns": [
         {
           "name": "support.function.builtin.cesium",
-          "match": "\\b(alloc|free|realloc|printf|debugf|assert|floor|ceil|trunc|round|trueround|abs|min|max|mean|norm)(?=\\s*\\()"
+          "match": "\\b(alloc|free|realloc|addrcontext|printf|debugf|assert|floor|ceil|trunc|round|trueround|abs|min|max|mean|norm)(?=\\s*\\()"
         },
         {
           "name": "support.function.method.cesium",
@@ -460,7 +477,7 @@
         },
         {
           "name": "variable.language.cesium",
-          "match": "\\b(this|super|self)\\b"
+          "match": "\\b(this|super)\\b"
         },
         {
           "name": "variable.other.member.cesium",

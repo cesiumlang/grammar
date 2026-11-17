@@ -1,0 +1,38 @@
+// SYNTAX TEST "source.cesium" "Operator and Keyword List Tests"
+
+// Compound assignment
+x += 1;
+//^^ keyword.operator.assignment.compound.cesium
+x -= 1;
+//^^ keyword.operator.assignment.compound.cesium
+x *= 2;
+//^^ keyword.operator.assignment.compound.cesium
+x /= 2;
+//^^ keyword.operator.assignment.compound.cesium
+x ^= 2;
+//^^ keyword.operator.assignment.compound.cesium
+x **= "s";
+//^^^ keyword.operator.assignment.compound.cesium
+x <<= 2;
+//^^^ keyword.operator.assignment.compound.cesium
+
+// Plain assignment and comparison are unaffected
+x = y ^ 2;
+//^ keyword.operator.assignment.cesium
+//    ^ keyword.operator.arithmetic.cesium
+if (x <= y) {
+//    ^^ keyword.operator.comparison.cesium
+}
+if (x == y) {
+//    ^^ keyword.operator.comparison.cesium
+}
+
+// import is a keyword
+import(std.io) as io;
+// <- keyword.other.cesium
+//             ^^ keyword.other.cesium
+
+// this and super
+this.x = super.x;
+// <- variable.language.cesium
+//       ^^^^^ variable.language.cesium
