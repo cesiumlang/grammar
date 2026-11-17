@@ -1,23 +1,23 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
     "files.associations": {
-      "*.cs": "cesium",
-      "*.czm": "cesium"
+      "*.csm": "cesium",
+      "*.csi": "cesium"
     },
     "files.watcherExclude": {
       "**/node_modules/**": true,
       "**/.cache/**": true,
-		},
+    },
     "files.exclude": {
       "**/node_modules/**": true,
     },
-		"editor.wrappingIndent": "indent",
-		"[markdown]": {
+    "editor.wrappingIndent": "indent",
+    "[markdown]": {
       "editor.quickSuggestions": {
         "other": true,
         "comments": false,
