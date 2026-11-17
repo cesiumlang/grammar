@@ -31,7 +31,7 @@
       }
     },
     "terminal.integrated.automationProfile.windows": {
-      "path": "C:\windows\system32\cmd.exe",
+      "path": "C:\\windows\\system32\\cmd.exe",
     },
     "ltex.additionalRules.motherTongue": "en-US",
     "cmake.configureOnOpen": false,
