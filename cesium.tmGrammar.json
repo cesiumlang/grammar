@@ -2,8 +2,8 @@
   "name": "cesium",
   "scopeName": "source.cesium",
   "fileTypes": [
-    "cs",
-    "czm"
+    "csm",
+    "csi"
   ],
   "uuid": "9ad5dda1-f2d3-478f-a8e2-5eef5b7bedf5",
   "patterns": [
