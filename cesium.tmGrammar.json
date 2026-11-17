@@ -349,7 +349,10 @@
           "name": "comment.block.documentation.cesium",
           "begin": "/\\*\\*",
           "end": "\\*/",
-          "patterns": [ { "name": "keyword.other.documentation.cesium", "match": "@(param|return|throws|author|since|version|see|deprecated)\\b" } ]
+          "patterns": [
+            { "name": "keyword.other.documentation.cesium", "match": "[@\\\\](param|return|returns|throws|author|since|version|see|deprecated|brief|file|class|struct|enum)\\b" },
+            { "name": "punctuation.definition.comment.cesium", "match": "^\\s*\\*(?!/)" }
+          ]
         },
         {
           "name": "comment.line.double-slash.cesium",
