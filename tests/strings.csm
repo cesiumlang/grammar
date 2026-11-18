@@ -16,8 +16,8 @@ str greeting = `Hello, {name}!`;
 //                           ^ string.interpolated.cesium
 
 // Test character literals
-char letter = 'A';
-//            ^^^ constant.character.cesium
+u8 letter = 'A';
+//          ^^^ constant.character.cesium
 
 // Test path strings
 path config = path("config.ini");

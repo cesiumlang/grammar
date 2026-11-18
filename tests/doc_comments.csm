@@ -1,0 +1,41 @@
+// SYNTAX TEST "source.cesium" "Documentation Comment Tests"
+
+  /**
+//^^^ comment.block.documentation.cesium
+   * Javadoc-style tags
+// ^ punctuation.definition.comment.cesium
+//   ^^^^^^^^^^^^^^^^^^ comment.block.documentation.cesium
+   * @param x The input parameter
+// ^ punctuation.definition.comment.cesium
+//   ^^^^^^ keyword.other.documentation.cesium
+   * @return The computed result
+//   ^^^^^^^ keyword.other.documentation.cesium
+   * @returns The computed result
+//   ^^^^^^^^ keyword.other.documentation.cesium
+   * @throws FileNotFound
+//   ^^^^^^^ keyword.other.documentation.cesium
+   */
+// ^^ comment.block.documentation.cesium
+i32 = documented_function(i32 x) {
+//    ^^^^^^^^^^^^^^^^^^^ entity.name.function.cesium
+}
+
+  /**
+   * Doxygen-style tags
+   * \brief Short description
+//   ^^^^^^ keyword.other.documentation.cesium
+   * \param x The input parameter
+//   ^^^^^^ keyword.other.documentation.cesium
+   * \returns The computed result
+//   ^^^^^^^^ keyword.other.documentation.cesium
+   * \file \class \struct \enum
+//   ^^^^^ keyword.other.documentation.cesium
+//         ^^^^^^ keyword.other.documentation.cesium
+//                ^^^^^^^ keyword.other.documentation.cesium
+//                        ^^^^^ keyword.other.documentation.cesium
+   * @unknown is not a tag
+//   ^^^^^^^^ comment.block.documentation.cesium
+   */
+
+  /* A plain block comment has no tags: @param */
+//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ comment.block.cesium
