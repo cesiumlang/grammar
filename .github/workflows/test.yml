@@ -1,10 +1,16 @@
 name: Grammar Tests
 
+# For pull requests into main and pushes to main, and by hand
+# (`gh workflow run test.yml --ref BRANCH`); not for dev, which the standing
+# pull request from dev to main checks (emanspeaks, 2026-11-21).
 on:
   push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   test:
