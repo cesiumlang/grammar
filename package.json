@@ -11,7 +11,7 @@
   "author": "Randy Eckman",
   "license": "MIT",
   "devDependencies": {
-    "vscode-tmgrammar-test": "^0.1.3"
+    "vscode-tmgrammar-test": "0.1.3"
   },
   "contributes": {
     "languages": [{

@@ -1,0 +1,202 @@
+================================================================================
+error types and unions
+================================================================================
+
+error FileNotFound {
+  str path;
+  i32 errno;
+}
+
+union FileError = FileNotFound|AccessDenied;
+alias Meters = f64;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (error_declaration
+    (identifier)
+    (member_block
+      (field_declaration
+        (type
+          (builtin_type))
+        (identifier))
+      (field_declaration
+        (type
+          (primitive_type))
+        (identifier))))
+  (union_declaration
+    (identifier)
+    (union_type
+      (type
+        (qualified_name
+          (identifier)))
+      (type
+        (qualified_name
+          (identifier)))))
+  (alias_declaration
+    (identifier)
+    (type
+      (primitive_type))))
+
+================================================================================
+error handling
+================================================================================
+
+FileError|file = open_file(str path) {
+  if (!file_exists(path)) {
+    return FileNotFound { path = path, errno = 2 };
+  }
+  throw AccessDenied { message = "no", permission_level = 0 };
+}
+
+x catch (err) {
+  case (FileNotFound) { printf("missing\n"); }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (return_types
+      (type
+        (qualified_name
+          (identifier)))
+      (type
+        (builtin_type)))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (builtin_type))
+        (identifier)))
+    (block
+      (if_statement
+        (parenthesized_expression
+          (unary_expression
+            (call_expression
+              (identifier)
+              (argument_list
+                (identifier)))))
+        (block
+          (return_statement
+            (struct_literal
+              (qualified_name
+                (identifier))
+              (field_initializer
+                (identifier)
+                (identifier))
+              (field_initializer
+                (identifier)
+                (integer_literal))))))
+      (throw_statement
+        (struct_literal
+          (qualified_name
+            (identifier))
+          (field_initializer
+            (identifier)
+            (string_literal
+              (string_content)))
+          (field_initializer
+            (identifier)
+            (integer_literal))))))
+  (catch_statement
+    (identifier)
+    (catch_clause
+      (identifier)
+      (block
+        (case_clause
+          (type
+            (qualified_name
+              (identifier)))
+          (block
+            (expression_statement
+              (call_expression
+                (identifier)
+                (argument_list
+                  (string_literal
+                    (string_content)
+                    (escape_sequence)))))))))))
+
+================================================================================
+generics, operators and interpolation
+================================================================================
+
+generic<numeric T> T = max(T a, T b) {
+  return a > b ? a : b;
+}
+
+Vector3 = operator $cross$(Vector3 a, Vector3 b) {
+  str s = `v = {a.x}\n`;
+  return ::(a.x^2);
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (generic_clause
+      (identifier)
+      (identifier))
+    (return_types
+      (type
+        (qualified_name
+          (identifier))))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier))
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier)))
+    (block
+      (return_statement
+        (ternary_expression
+          (binary_expression
+            (identifier)
+            (identifier))
+          (identifier)
+          (identifier)))))
+  (function_definition
+    (return_types
+      (type
+        (qualified_name
+          (identifier))))
+    (custom_operator)
+    (parameter_list
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier))
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier)))
+    (block
+      (variable_declaration
+        (type
+          (builtin_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (interpolated_string
+            (string_content)
+            (interpolation
+              (member_expression
+                (identifier)
+                (identifier)))
+            (escape_sequence))))
+      (return_statement
+        (unary_expression
+          (parenthesized_expression
+            (binary_expression
+              (member_expression
+                (identifier)
+                (identifier))
+              (integer_literal))))))))
