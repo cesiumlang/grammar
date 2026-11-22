@@ -39,15 +39,16 @@
 (function_definition name: (identifier) @function)
 (constructor_definition name: (identifier) @constructor)
 (destructor_definition name: (identifier) @constructor)
-(call_expression function: (identifier) @function.call)
-(call_expression function: (member_expression member: (identifier) @function.method))
-(generic_call_expression function: (identifier) @function.call)
-(super_call (identifier) @constructor)
+; builtins first: of two patterns on one node the earlier wins
 (call_expression
   function: (identifier) @function.builtin
   (#any-of? @function.builtin
     "alloc" "free" "realloc" "addrcontext" "printf" "debugf" "assert"
     "floor" "ceil" "trunc" "round" "trueround" "abs" "min" "max" "mean" "norm"))
+(call_expression function: (identifier) @function.call)
+(call_expression function: (member_expression member: (identifier) @function.method))
+(generic_call_expression function: (identifier) @function.call)
+(super_call (identifier) @constructor)
 
 ; variables
 (parameter name: (identifier) @variable.parameter)
