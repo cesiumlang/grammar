@@ -1,0 +1,324 @@
+================================================================================
+struct, global and function
+================================================================================
+
+struct Token {
+  i64 kind;
+  #u8 start;
+  u8 buf[20];
+}
+
+const i64 TOK_IDENT = 1;
+i64 count = 0;
+
+i32 = main(i32 argc, ##u8 argv) {
+  return 0;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    (identifier)
+    (member_block
+      (field_declaration
+        (type
+          (primitive_type))
+        (identifier))
+      (field_declaration
+        (type
+          (pointer_sigil)
+          (primitive_type))
+        (identifier))
+      (field_declaration
+        (type
+          (primitive_type))
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (qualifier)
+    (type
+      (primitive_type))
+    (declarator
+      (identifier)
+      (assign_operator)
+      (integer_literal)))
+  (variable_declaration
+    (type
+      (primitive_type))
+    (declarator
+      (identifier)
+      (assign_operator)
+      (integer_literal)))
+  (function_definition
+    (return_types
+      (type
+        (primitive_type)))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (primitive_type))
+        (identifier))
+      (parameter
+        (type
+          (pointer_sigil)
+          (pointer_sigil)
+          (primitive_type))
+        (identifier)))
+    (block
+      (return_statement
+        (integer_literal)))))
+
+================================================================================
+extern block
+================================================================================
+
+extern libc = import('c') {
+  i64 = write(i32 fd, #u8 buf, u64 n);
+  void = exit(i32 code);
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (extern_declaration
+    (identifier)
+    (import_expression
+      (char_literal
+        (string_content)))
+    (function_definition
+      (return_types
+        (type
+          (primitive_type)))
+      (identifier)
+      (parameter_list
+        (parameter
+          (type
+            (primitive_type))
+          (identifier))
+        (parameter
+          (type
+            (pointer_sigil)
+            (primitive_type))
+          (identifier))
+        (parameter
+          (type
+            (primitive_type))
+          (identifier))))
+    (function_definition
+      (return_types
+        (type
+          (primitive_type)))
+      (identifier)
+      (parameter_list
+        (parameter
+          (type
+            (primitive_type))
+          (identifier))))))
+
+================================================================================
+ownership operators
+================================================================================
+
+void = f() {
+  #Token t := alloc(1);
+  #Token b #= t;
+  t.start #= "hello";
+  t.kind = 3;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (return_types
+      (type
+        (primitive_type)))
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (type
+          (pointer_sigil)
+          (qualified_name
+            (identifier)))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (call_expression
+            (identifier)
+            (argument_list
+              (integer_literal)))))
+      (variable_declaration
+        (type
+          (pointer_sigil)
+          (qualified_name
+            (identifier)))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (identifier)))
+      (assignment
+        (member_expression
+          (identifier)
+          (identifier))
+        (assign_operator)
+        (string_literal
+          (string_content)))
+      (assignment
+        (member_expression
+          (identifier)
+          (identifier))
+        (assign_operator)
+        (integer_literal)))))
+
+================================================================================
+statements
+================================================================================
+
+void = g(i32 n) {
+  u8 tmp[20];
+  while (n > 0) {
+    if (n == 1) { break; } else if (n == 2) { continue; } else { n = n - 1; }
+  }
+  write(1, tmp, sizeof(Token));
+  return;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (return_types
+      (type
+        (primitive_type)))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (primitive_type))
+        (identifier)))
+    (block
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (integer_literal)))
+      (while_statement
+        (parenthesized_expression
+          (binary_expression
+            (identifier)
+            (integer_literal)))
+        (block
+          (if_statement
+            (parenthesized_expression
+              (binary_expression
+                (identifier)
+                (integer_literal)))
+            (block
+              (break_statement))
+            (if_statement
+              (parenthesized_expression
+                (binary_expression
+                  (identifier)
+                  (integer_literal)))
+              (block
+                (continue_statement))
+              (block
+                (assignment
+                  (identifier)
+                  (assign_operator)
+                  (binary_expression
+                    (identifier)
+                    (integer_literal))))))))
+      (expression_statement
+        (call_expression
+          (identifier)
+          (argument_list
+            (integer_literal)
+            (identifier)
+            (sizeof_expression
+              (type
+                (qualified_name
+                  (identifier)))))))
+      (return_statement))))
+
+================================================================================
+expressions
+================================================================================
+
+void = h() {
+  i32 x = (1 + 2 * 3) % 4;
+  u8 c = ('0' + (x % 10)) as u8;
+  i32 y = a[i].b.c && !d || e >< f;
+  p = #x;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (return_types
+      (type
+        (primitive_type)))
+    (identifier)
+    (parameter_list)
+    (block
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (binary_expression
+            (parenthesized_expression
+              (binary_expression
+                (integer_literal)
+                (binary_expression
+                  (integer_literal)
+                  (integer_literal))))
+            (integer_literal))))
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (cast_expression
+            (parenthesized_expression
+              (binary_expression
+                (char_literal
+                  (string_content))
+                (parenthesized_expression
+                  (binary_expression
+                    (identifier)
+                    (integer_literal)))))
+            (type
+              (primitive_type)))))
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (binary_expression
+            (binary_expression
+              (member_expression
+                (member_expression
+                  (index_expression
+                    (identifier)
+                    (identifier))
+                  (identifier))
+                (identifier))
+              (unary_expression
+                (identifier)))
+            (binary_expression
+              (identifier)
+              (identifier)))))
+      (assignment
+        (identifier)
+        (assign_operator)
+        (unary_expression
+          (identifier))))))
