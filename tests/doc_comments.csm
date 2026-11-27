@@ -21,18 +21,16 @@ i32 = documented_function(i32 x) {
 }
 
   /**
-   * Doxygen-style tags
-   * \brief Short description
+   * More tags
+   * @brief Short description
 //   ^^^^^^ keyword.other.documentation.cesium
-   * \param x The input parameter
-//   ^^^^^^ keyword.other.documentation.cesium
-   * \returns The computed result
-//   ^^^^^^^^ keyword.other.documentation.cesium
-   * \file \class \struct \enum
+   * @file @class @struct @enum
 //   ^^^^^ keyword.other.documentation.cesium
 //         ^^^^^^ keyword.other.documentation.cesium
 //                ^^^^^^^ keyword.other.documentation.cesium
 //                        ^^^^^ keyword.other.documentation.cesium
+   * \param is not a tag: Doxygen backslash tags are not Cesium
+//   ^^^^^^ comment.block.documentation.cesium
    * @unknown is not a tag
 //   ^^^^^^^^ comment.block.documentation.cesium
    */
