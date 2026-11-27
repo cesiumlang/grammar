@@ -27,6 +27,24 @@ if (x == y) {
 //    ^^ keyword.operator.comparison.cesium
 }
 
+// address comparison (#== and #!=), bitwise NOT (!.), the elementwise
+// product (.*) and the conditional operator, as the specification has them
+if (p #== q) {
+//    ^^^ keyword.operator.comparison.address.cesium
+}
+if (p #!= null) {
+//    ^^^ keyword.operator.comparison.address.cesium
+}
+x = !.y;
+//  ^^ keyword.operator.bitwise.not.cesium
+z = a .* b;
+//    ^^ keyword.operator.arithmetic.elementwise.cesium
+m = c ? a : b;
+//    ^ keyword.operator.ternary.cesium
+//        ^ keyword.operator.ternary.cesium
+r = ::x;
+//  ^^ keyword.operator.arithmetic.cesium
+
 // import is a keyword
 import(std.io) as io;
 // <- keyword.other.cesium
