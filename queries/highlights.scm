@@ -12,7 +12,7 @@
 
 (integer_literal) @number
 (float_literal) @number.float
-(boolean_literal) @constant.builtin
+((identifier) @constant.builtin (#any-of? @constant.builtin "true" "false"))
 (null) @constant.builtin
 (undefined) @constant.builtin
 (this) @variable.builtin
@@ -40,6 +40,11 @@
 (constructor_definition name: (identifier) @constructor)
 (destructor_definition name: (identifier) @constructor)
 ; builtins first: of two patterns on one node the earlier wins
+; a conversion, the type's name used as a function (s0.expr.convert)
+(call_expression
+  function: (identifier) @type.builtin
+  (#any-of? @type.builtin
+    "u8" "u16" "u32" "u64" "i8" "i16" "i32" "i64" "uword" "f16" "f32" "f64" "f128"))
 (call_expression
   function: (identifier) @function.builtin
   (#any-of? @function.builtin

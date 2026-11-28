@@ -244,11 +244,17 @@ module.exports = grammar({
         field('body', $.block),
       ),
 
+    // import(ns, "path/to/file.csm") (s0.import); the other forms are the
+    // reference's, and how an import ends is open (cesium#19)
     import_declaration: ($) =>
       seq(
         'import',
         '(',
-        choice($.char_literal, $.qualified_name),
+        choice(
+          seq(field('namespace', $.identifier), ',', field('path', $.string_literal)),
+          $.char_literal,
+          $.qualified_name,
+        ),
         ')',
         optional(
           seq(
@@ -278,8 +284,9 @@ module.exports = grammar({
           'operator',
           choice(
             $.custom_operator,
-            '+', '-', '*', '/', '%', '@', '^', '**', '::', '<<', '>>',
-            '<', '>', '<=', '>=', '==', '!=', '&', '|', '><', '!', '~',
+            '+', '-', '*', '.*', '/', '%', '@', '^', '**', '::', '<<', '>>',
+            '<', '>', '<=', '>=', '==', '!=', '&', '|', '><', '!', '!.', '~',
+            '++', '--',
             seq('[', ']'),
           ),
         ),
@@ -330,7 +337,8 @@ module.exports = grammar({
     type_suffix: ($) =>
       seq('[', commaSep(choice($.type, $.integer_literal)), ']'),
 
-    primitive_type: () => token(prec(1, /[ui][0-9]+|f(16|32|64|128)|uword|void|bool/)),
+    // no bool (lex.predeclared.truth)
+    primitive_type: () => token(prec(1, /[ui][0-9]+|f(16|32|64|128)|uword|void/)),
 
     builtin_type: () => choice('file', 'str', 'list', 'dict', 'slice', 'path'),
 
@@ -544,12 +552,14 @@ module.exports = grammar({
         [PREC.bit_or, '|'],
         [PREC.bit_xor, '><'],
         [PREC.bit_and, '&'],
-        [PREC.equal, choice('==', '!=')],
+        [PREC.equal, choice('==', '!=', '#==', '#!=')],
         [PREC.relational, choice('<', '>', '<=', '>=')],
         [PREC.range, choice('..', '..=')],
         [PREC.shift, choice('<<', '>>')],
-        [PREC.additive, choice('+', '-', '#+', '#-', '~+', '~-')],
-        [PREC.multiplicative, choice('*', '/', '%', '@', $.custom_operator)],
+        // `~` is a token of its own (lex.token.tilde): `a ~+ b` parses as
+        // a transpose and `+`, and the checker decides what it is
+        [PREC.additive, choice('+', '-', '#+', '#-')],
+        [PREC.multiplicative, choice('*', '.*', '/', '%', '@', $.custom_operator)],
         [PREC.root, '::'],
       ];
       return choice(
@@ -578,7 +588,10 @@ module.exports = grammar({
       prec(
         PREC.unary,
         seq(
-          field('operator', choice('#', '~', '!', '-', '+', '..', '::', $.custom_operator)),
+          field('operator', choice(
+            '#', '~', '!', '!.', '-', '+', '++', '--', '#++', '#--', '..', '::',
+            $.custom_operator,
+          )),
           field('operand', $._expression),
         ),
       ),
@@ -588,7 +601,7 @@ module.exports = grammar({
         PREC.postfix,
         seq(
           field('operand', $._expression),
-          field('operator', choice('~', '..', '#++', '#--', '~++', '~--', '++', '--')),
+          field('operator', choice('~', '..', '#++', '#--', '++', '--')),
         ),
       ),
 
@@ -656,7 +669,9 @@ module.exports = grammar({
 
     typeof_expression: ($) => seq('typeof', '(', $._expression, ')'),
 
-    import_expression: ($) => seq('import', '(', $.char_literal, ')'),
+    // the library of an extern block: "c" (s0.extern), or 'c' as stage 0 reads it
+    import_expression: ($) =>
+      seq('import', '(', field('library', choice($.string_literal, $.char_literal)), ')'),
 
     parenthesized_expression: ($) => seq('(', $._expression, ')'),
 
@@ -705,7 +720,6 @@ module.exports = grammar({
         $.char_literal,
         $.string_literal,
         $.interpolated_string,
-        $.boolean_literal,
         $.null,
         $.undefined,
       ),
@@ -758,7 +772,7 @@ module.exports = grammar({
         seq('\\', choice(/[nrt0"'`\\{}]/, /u\{[0-9a-fA-F]+\}/, /x[0-9a-fA-F]{2}/)),
       ),
 
-    boolean_literal: () => choice('true', 'false'),
+    // true and false are predeclared constants, not keywords (lex.predeclared.truth)
     null: () => 'null',
     undefined: () => 'undefined',
 

@@ -200,3 +200,178 @@ Vector3 = operator $cross$(Vector3 a, Vector3 b) {
                 (identifier)
                 (identifier))
               (integer_literal))))))))
+
+================================================================================
+imports, conversions and the operators of 2026-11-22
+================================================================================
+
+import(lex, "lex.csm");
+
+extern libc = import("c") {
+  i64 = write(i32 fd, #u8 buf, uword len);
+}
+
+i32 = main(i32 argc, ##u8 argv) {
+  u8 k = u8(argc);
+  u8 t = true;
+  #u8 q #= argv[0];
+  if (q #== null || q #!= argv[1]) {
+    k += 1;
+  }
+  i32 m = !.k;
+  ++k;
+  k--;
+  #++q;
+  q#--;
+  return k > 1 ? m : 0;
+}
+
+M = scale(M a, M b) {
+  return a .* b + a~ * b;
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_declaration
+    (identifier)
+    (string_literal
+      (string_content)))
+  (extern_declaration
+    (identifier)
+    (import_expression
+      (string_literal
+        (string_content)))
+    (function_definition
+      (return_types
+        (type
+          (primitive_type)))
+      (identifier)
+      (parameter_list
+        (parameter
+          (type
+            (primitive_type))
+          (identifier))
+        (parameter
+          (type
+            (pointer_sigil)
+            (primitive_type))
+          (identifier))
+        (parameter
+          (type
+            (primitive_type))
+          (identifier)))))
+  (function_definition
+    (return_types
+      (type
+        (primitive_type)))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (primitive_type))
+        (identifier))
+      (parameter
+        (type
+          (pointer_sigil)
+          (pointer_sigil)
+          (primitive_type))
+        (identifier)))
+    (block
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (call_expression
+            (identifier)
+            (argument_list
+              (identifier)))))
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (identifier)))
+      (variable_declaration
+        (type
+          (pointer_sigil)
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (index_expression
+            (identifier)
+            (integer_literal))))
+      (if_statement
+        (parenthesized_expression
+          (binary_expression
+            (binary_expression
+              (identifier)
+              (null))
+            (binary_expression
+              (identifier)
+              (index_expression
+                (identifier)
+                (integer_literal)))))
+        (block
+          (assignment
+            (identifier)
+            (assign_operator)
+            (integer_literal))))
+      (variable_declaration
+        (type
+          (primitive_type))
+        (declarator
+          (identifier)
+          (assign_operator)
+          (unary_expression
+            (identifier))))
+      (expression_statement
+        (unary_expression
+          (identifier)))
+      (expression_statement
+        (postfix_expression
+          (identifier)))
+      (expression_statement
+        (unary_expression
+          (identifier)))
+      (expression_statement
+        (postfix_expression
+          (identifier)))
+      (return_statement
+        (ternary_expression
+          (binary_expression
+            (identifier)
+            (integer_literal))
+          (identifier)
+          (integer_literal)))))
+  (function_definition
+    (return_types
+      (type
+        (qualified_name
+          (identifier))))
+    (identifier)
+    (parameter_list
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier))
+      (parameter
+        (type
+          (qualified_name
+            (identifier)))
+        (identifier)))
+    (block
+      (return_statement
+        (binary_expression
+          (binary_expression
+            (identifier)
+            (identifier))
+          (binary_expression
+            (postfix_expression
+              (identifier))
+            (identifier)))))))

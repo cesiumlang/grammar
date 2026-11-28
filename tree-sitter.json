@@ -8,6 +8,7 @@
       "path": ".",
       "file-types": ["csm", "csi"],
       "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm",
       "injection-regex": "^(cesium|csm)$"
     }
   ],

@@ -1,0 +1,37 @@
+// The outline of a file being typed: each definition is still found when
+// the code around it is broken.
+
+import(lex, "lex.csm");
+//     ^ definition.module
+
+extern libc = import("c") {
+//     ^ definition.module
+  i64 = write(i32 fd, #u8 buf, uword len);
+//      ^ definition.function
+}
+
+const i64 TOK_IDENT = 1;
+//        ^ definition.variable
+
+struct Token {
+//     ^ definition.struct
+  i64 kind
+  #u8 start;
+//    ^ definition.field
+}
+
+i32 = count(#Token t) {
+//    ^ definition.function
+//           ^ reference.type
+  i32 n = t.kind +
+}
+
+i32 = main(i32 argc, ##u8 argv) {
+//    ^ definition.function
+  if (argc > 1 {
+    write(1, "hi\n", 3);
+//  ^ reference.call
+  }
+  return count(argv);
+//       ^ reference.call
+}
