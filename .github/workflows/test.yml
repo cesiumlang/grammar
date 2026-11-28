@@ -33,3 +33,33 @@ jobs:
       if: failure()
       run: npm run test:snap
       continue-on-error: true
+
+  # The Tree-sitter grammar: src/ is what grammar.js generates, and the corpus
+  # and tags tests pass. The CLI is the version of cesium-buildtools.
+  tree-sitter:
+    runs-on: ubuntu-24.04
+    env:
+      TREESITTER_VERSION: 0.27.2
+      TREESITTER_SHA256: b4233ecc4f0e648d6d8ccc4bac96c00c712ca1a5eb1e0ca7197d29b750bffa6d
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version-file: .node-version
+
+    - name: Install the tree-sitter CLI
+      run: |
+        curl -sSfL -o ts.zip "https://github.com/tree-sitter/tree-sitter/releases/download/v$TREESITTER_VERSION/tree-sitter-cli-linux-x64.zip"
+        echo "$TREESITTER_SHA256  ts.zip" | sha256sum -c -
+        mkdir -p "$RUNNER_TEMP/ts" && unzip -q ts.zip -d "$RUNNER_TEMP/ts" && rm ts.zip
+        chmod +x "$RUNNER_TEMP/ts/tree-sitter"
+        echo "$RUNNER_TEMP/ts" >> "$GITHUB_PATH"
+
+    - name: Generated parser is up to date
+      run: |
+        tree-sitter generate
+        git diff --exit-code --stat -- src/ || { echo "::error::src/ is not what grammar.js generates: run tree-sitter generate and commit it"; exit 1; }
+
+    - name: Corpus and tags tests
+      run: tree-sitter test

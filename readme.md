@@ -11,7 +11,9 @@ Grammar files and other resources for syntax highlighters of the [Cesium program
 | `grammar.js` | The [Tree-sitter](https://tree-sitter.github.io) grammar (`tree_sitter_cesium`): exact for S0, tolerant of the forms of the full language that the reference pages use |
 | `src/` | What `tree-sitter generate` writes from `grammar.js` (`parser.c` and the rest); committed so that nothing needs Node.js to build the parser. Never edit it by hand |
 | `queries/highlights.scm` | The highlight queries: capture names such as `keyword.control` and `function.builtin`. Only the predicates `#eq?`, `#not-eq?` and `#any-of?` are used |
+| `queries/tags.scm` | The tags queries: the definitions an outline lists and go to definition finds, and the references to them |
 | `test/corpus/` | Tree-sitter tests: the expected syntax tree of S0 programs and of the full-language forms |
+| `test/tags/` | Tree-sitter tests of the tags, in code broken the way code being typed is |
 | `tools/highlight/` | `cesium-highlight`, a Zig program that writes Cesium source as HTML with one `<span class="...">` per token (`keyword.control` is `class="keyword control"`), so colors are a style sheet; also a library module, `highlight` |
 | `build.zig` | Builds the highlighter; the Tree-sitter runtime is a pinned dependency |
 | `tests/` | Highlighting tests: Cesium files annotated with the scopes each token must get |
@@ -36,12 +38,12 @@ The tree-sitter CLI is in [cesium-buildtools](https://github.com/cesiumlang/cesi
 
 ```sh
 tree-sitter generate   # grammar.js to src/parser.c
-tree-sitter test       # test/corpus
+tree-sitter test       # test/corpus and test/tags
 zig build test         # the highlighter
 zig build              # zig-out/bin/cesium-highlight
 ```
 
-`cesium-highlight [--wrap] [FILE]` reads standard input when there is no file. After a change of `grammar.js`, run `tree-sitter generate` and commit what it writes.
+`cesium-highlight [--wrap] [FILE]` reads standard input when there is no file. After a change of `grammar.js`, run `tree-sitter generate` and commit what it writes; CI fails when `src/` is not what `grammar.js` generates.
 
 ## Status
 
