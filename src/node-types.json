@@ -70,10 +70,6 @@
         "named": true
       },
       {
-        "type": "boolean_literal",
-        "named": true
-      },
-      {
         "type": "call_expression",
         "named": true
       },
@@ -374,11 +370,19 @@
             "named": false
           },
           {
+            "type": "#!=",
+            "named": false
+          },
+          {
             "type": "#+",
             "named": false
           },
           {
             "type": "#-",
+            "named": false
+          },
+          {
+            "type": "#==",
             "named": false
           },
           {
@@ -407,6 +411,10 @@
           },
           {
             "type": "-",
+            "named": false
+          },
+          {
+            "type": ".*",
             "named": false
           },
           {
@@ -476,14 +484,6 @@
           {
             "type": "||",
             "named": false
-          },
-          {
-            "type": "~+",
-            "named": false
-          },
-          {
-            "type": "~-",
-            "named": false
           }
         ]
       },
@@ -517,11 +517,6 @@
         }
       ]
     }
-  },
-  {
-    "type": "boolean_literal",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "break_statement",
@@ -1169,6 +1164,10 @@
             "named": false
           },
           {
+            "type": "!.",
+            "named": false
+          },
+          {
             "type": "!=",
             "named": false
           },
@@ -1197,11 +1196,23 @@
             "named": false
           },
           {
+            "type": "++",
+            "named": false
+          },
+          {
             "type": "-",
             "named": false
           },
           {
+            "type": "--",
+            "named": false
+          },
+          {
             "type": ".",
+            "named": false
+          },
+          {
+            "type": ".*",
             "named": false
           },
           {
@@ -1456,10 +1467,31 @@
   {
     "type": "import_declaration",
     "named": true,
-    "fields": {},
+    "fields": {
+      "namespace": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "path": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string_literal",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "char_literal",
@@ -1479,16 +1511,21 @@
   {
     "type": "import_expression",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "char_literal",
-          "named": true
-        }
-      ]
+    "fields": {
+      "library": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "char_literal",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1772,14 +1809,6 @@
           },
           {
             "type": "~",
-            "named": false
-          },
-          {
-            "type": "~++",
-            "named": false
-          },
-          {
-            "type": "~--",
             "named": false
           }
         ]
@@ -2197,7 +2226,19 @@
             "named": false
           },
           {
+            "type": "!.",
+            "named": false
+          },
+          {
             "type": "#",
+            "named": false
+          },
+          {
+            "type": "#++",
+            "named": false
+          },
+          {
+            "type": "#--",
             "named": false
           },
           {
@@ -2205,7 +2246,15 @@
             "named": false
           },
           {
+            "type": "++",
+            "named": false
+          },
+          {
             "type": "-",
+            "named": false
+          },
+          {
+            "type": "--",
             "named": false
           },
           {
@@ -2357,6 +2406,10 @@
     "named": false
   },
   {
+    "type": "!.",
+    "named": false
+  },
+  {
     "type": "!=",
     "named": false
   },
@@ -2366,6 +2419,10 @@
   },
   {
     "type": "#",
+    "named": false
+  },
+  {
+    "type": "#!=",
     "named": false
   },
   {
@@ -2386,6 +2443,10 @@
   },
   {
     "type": "#=",
+    "named": false
+  },
+  {
+    "type": "#==",
     "named": false
   },
   {
@@ -2466,6 +2527,10 @@
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": ".*",
     "named": false
   },
   {
@@ -2687,10 +2752,6 @@
     "named": false
   },
   {
-    "type": "false",
-    "named": false
-  },
-  {
     "type": "file",
     "named": false
   },
@@ -2819,10 +2880,6 @@
     "named": false
   },
   {
-    "type": "true",
-    "named": false
-  },
-  {
     "type": "typeof",
     "named": false
   },
@@ -2868,22 +2925,6 @@
   },
   {
     "type": "~",
-    "named": false
-  },
-  {
-    "type": "~+",
-    "named": false
-  },
-  {
-    "type": "~++",
-    "named": false
-  },
-  {
-    "type": "~-",
-    "named": false
-  },
-  {
-    "type": "~--",
     "named": false
   },
   {
